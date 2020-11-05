@@ -1,0 +1,71 @@
+package com.neverrar.datacloudplatform.backend.model;
+
+import com.neverrar.datacloudplatform.backend.model.Project;
+import com.neverrar.datacloudplatform.backend.model.Test;
+
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity // This tells Hibernate to make a table out of this class
+public class Tester {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+
+    private String name;
+
+    private String gender;
+
+    private String education;
+
+    @Column(name="driving_years")
+    private Double drivingYears;
+
+    @ManyToOne
+    @JoinColumn(name="project_id")
+    private Project project;
+
+    @OneToMany(mappedBy = "tester",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    private Set<Test> testSet;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getEducation(){
+        return education;
+    }
+
+    public void setEducation(String education){
+        this.education = education;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Double getDrivingYears() {
+        return drivingYears;
+    }
+
+    public void setDrivingYears(Double drivingYears) {
+        this.drivingYears = drivingYears;
+    }
+
+}
