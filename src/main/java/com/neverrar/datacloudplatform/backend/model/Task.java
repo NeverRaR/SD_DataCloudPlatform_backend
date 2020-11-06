@@ -23,7 +23,7 @@ public class Task {
     @JoinColumn(name="project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "task",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "task",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
     public String getName() {

@@ -1,8 +1,6 @@
 package com.neverrar.datacloudplatform.backend.model;
 
 
-import com.neverrar.datacloudplatform.backend.model.Project;
-
 import javax.persistence.*;
 import java.util.Set;
 
@@ -17,9 +15,8 @@ public class User {
 
     private Integer role;
 
-    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Project> projectSet;
-
 
     public String getId() {
         return id;

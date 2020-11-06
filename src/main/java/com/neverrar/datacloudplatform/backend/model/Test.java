@@ -24,7 +24,6 @@ public class Test {
     @JoinColumn(name="task_id")
     private Task task;
 
-
     public Integer getId() {
         return id;
     }

@@ -25,7 +25,7 @@ public class Tester {
     @JoinColumn(name="project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "tester",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "tester",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
     public String getName() {

@@ -27,10 +27,10 @@ public class Project {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Task> taskSet;
 
-    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Tester> testerSet;
 
     public String getName() {
@@ -63,5 +63,21 @@ public class Project {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
