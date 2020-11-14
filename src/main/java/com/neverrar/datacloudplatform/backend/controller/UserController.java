@@ -1,10 +1,13 @@
 package com.neverrar.datacloudplatform.backend.controller;
 
+import com.neverrar.datacloudplatform.backend.error.*;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
 import com.neverrar.datacloudplatform.backend.util.HashHelper;
+import com.neverrar.datacloudplatform.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,42 +26,42 @@ public class UserController {
     private StringRedisTemplate template;
 
     @PostMapping(path="/register") // Map ONLY POST Requests
-    public @ResponseBody String addNewUser (@RequestBody User user) {
+    public @ResponseBody
+    Result<String> addNewUser (@RequestBody User user) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-
+        Result<User> result=new Result<>();
         Optional<User> opt=userRepository.findById(user.getId());
-        if(opt.isPresent()) return "ID already exists!";
-
+        if(opt.isPresent()) return Result.wrapErrorResult(new UserAlreadyExistedError());
         User n = new User();
         n.setUsername(user.getName());
         n.setPassword(HashHelper.computeSha256Hash(user.getPassword()));
         n.setId(user.getId());
         n.setRole(0);
         userRepository.save(n);
-        return "Saved";
+        return Result.wrapSuccessfulResult("Saved");
     }
 
     @PostMapping(path="/login")
-    public @ResponseBody String getLoginToken(@RequestBody User user) {
+    public @ResponseBody Result<String> getLoginToken(@RequestBody User user) {
 
         String sessionId;
         Optional<User> opt=userRepository.findById(user.getId());
-        if(!opt.isPresent()) return "ID is not exists!";
+        if(!opt.isPresent()) return Result.wrapErrorResult(new UserNotExistedError());
         String passwordHashed=HashHelper.computeSha256Hash(user.getPassword());
-        if(!opt.get().getPassword().equals(passwordHashed)) return "Wrong password!";
+        if(!opt.get().getPassword().equals(passwordHashed)) return Result.wrapErrorResult(new WrongPasswordError());;
         double seed=ThreadLocalRandom.current().nextDouble();
         sessionId=HashHelper.computeMD5Hash(user.getId()+ seed);
-        if(sessionId==null) return "SessionId is null!";
+        if(sessionId==null) return Result.wrapErrorResult(new NullError());
         template.opsForValue().set(sessionId,user.getId(),3, TimeUnit.HOURS);
-        return sessionId;
+        return Result.wrapSuccessfulResult(sessionId);
     }
 
     @DeleteMapping(path="/logout")
-    public @ResponseBody String invalidateSessionId(@RequestParam String sessionId) {
+    public @ResponseBody Result<String> invalidateSessionId(@RequestParam String sessionId) {
         String id=template.opsForValue().get(sessionId);
-        if(id==null) return "SessionId is invalid!";
+        if(id==null) return Result.wrapErrorResult(new InvalidSessionIdError());
         template.delete(sessionId);
-        return id+" Log out!";
+        return Result.wrapSuccessfulResult("logout!");
     }
 }

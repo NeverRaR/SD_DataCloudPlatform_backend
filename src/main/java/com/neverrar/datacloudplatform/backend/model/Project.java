@@ -65,7 +65,11 @@ public class Project {
         this.lastModified = lastModified;
     }
 
-    public User getOwner() {
+    public String getOwner() {
+        return owner.getId();
+    }
+
+    public User OwnerInstance() {
         return owner;
     }
 
@@ -79,5 +83,13 @@ public class Project {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Set<Task> getTaskSet() {
+        return taskSet;
+    }
+
+    public void setTaskSet(Set<Task> taskSet) {
+        this.taskSet = taskSet;
     }
 }

@@ -1,10 +1,15 @@
 package com.neverrar.datacloudplatform.backend.controller;
 
+import com.neverrar.datacloudplatform.backend.error.InvalidSessionIdError;
+import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
+import com.neverrar.datacloudplatform.backend.error.ProjectNotExistedError;
+import com.neverrar.datacloudplatform.backend.error.UserNotExistedError;
 import com.neverrar.datacloudplatform.backend.model.Project;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
-import com.neverrar.datacloudplatform.backend.request.ProjectRequest;
+import com.neverrar.datacloudplatform.backend.util.Request;
+import com.neverrar.datacloudplatform.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller // This means that this class is a Controller
 @RequestMapping(path="/projects") // This means URL's start with /demo (after Application path)
@@ -27,59 +33,70 @@ public class ProjectController {
     private ProjectRepository projectRepository;
 
     @PostMapping // Map ONLY POST Requests
-    public @ResponseBody String addNewProject (@RequestBody ProjectRequest request) {
+    public @ResponseBody
+    Result<String> addNewProject (@RequestBody  Request<Project> request) {
         String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return "SessionId is invalid!";
-        Optional<User> optionalUser=userRepository.findById(userId);
-        if(!optionalUser.isPresent()) return "User isn't exists!";
+        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         Date date=new Date();
-        Project project=request.getProject();
+        Project project=request.getData();
         project.setCreateTime(date);
         project.setLastModified(date);
-        project.setOwner(optionalUser.get());
+        User user=new User();
+        user.setId(userId);
+        project.setOwner(user);
         projectRepository.save(project);
-        return "Saved";
+        return Result.wrapSuccessfulResult("Saved");
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody String getProject (@RequestBody ProjectRequest request,@PathVariable Integer id) {
-        String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return "SessionId is invalid!";
+    public @ResponseBody Result<Project> getProject (@RequestParam String sessionId,@PathVariable Integer id) {
+        String userId=template.opsForValue().get(sessionId);
+        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return "Project isn't exists!";
-        if(!userId.equals(optionalProject.get().getOwner().getId())) return "Wrong user!";
-        return optionalProject.get().getName()+"\n"+optionalProject.get().getDescription();
+        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
+        if(!userId.equals(optionalProject.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
+        return Result.wrapSuccessfulResult(optionalProject.get());
+    }
+
+    @GetMapping
+    public @ResponseBody Result<Set<Project>> getAllProject (@RequestParam String sessionId) {
+        String userId=template.opsForValue().get(sessionId);
+        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
+        Optional<User> optionalUser= userRepository.findById(userId);
+        if(!optionalUser.isPresent()) return Result.wrapErrorResult(new UserNotExistedError());
+        return Result.wrapSuccessfulResult(optionalUser.get().getProjectSet());
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody String updateProject (@RequestBody ProjectRequest request,@PathVariable Integer id) {
+    public @ResponseBody Result<Project> updateProject (@RequestBody Request<Project> request, @PathVariable Integer id) {
         String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return "SessionId is invalid!";
-        Optional<User> optionalUser=userRepository.findById(userId);
-        if(!optionalUser.isPresent()) return "User isn't exists";
+        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return "Project isn't exists!";
-        if(!userId.equals(optionalProject.get().getOwner().getId())) return "Wrong user!";
+        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
+        if(!userId.equals(optionalProject.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
         Date date=new Date();
         Project project=new Project();
         project.setId(id);
         project.setLastModified(date);
-        project.setOwner(optionalUser.get());
-        project.setDescription(request.getProject().getDescription());
-        project.setName(request.getProject().getName());
+        User user=new User();
+        user.setId(userId);
+        project.setOwner(user);
+        project.setDescription(request.getData().getDescription());
+        project.setName(request.getData().getName());
         projectRepository.save(project);
-        return "Saved";
+        return Result.wrapSuccessfulResult(project);
     }
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody String invalidateSessionId(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> invalidateSessionId(@RequestParam String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
-        if(userId==null) return "SessionId is invalid!";
+        if(userId==null) return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return "Project isn't exists!";
-        if(!userId.equals(optionalProject.get().getOwner().getId())) return "Wrong user!";
+        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
+        if(!userId.equals(optionalProject.get().getOwner()))
+            return Result.wrapErrorResult(new PermissionDeniedError());
         projectRepository.delete(optionalProject.get());
-        return optionalProject.get().getId() +" is deleted!";
+        return Result.wrapSuccessfulResult("Deleted");
     }
 }

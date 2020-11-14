@@ -12,7 +12,7 @@ public class Test {
     @Column(name="test_order")
     private Integer order;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     @Column(name="test_time")
     private Date testTime;
 
@@ -23,6 +23,10 @@ public class Test {
     @ManyToOne
     @JoinColumn(name="task_id")
     private Task task;
+
+    @ManyToOne
+    @JoinColumn(name="owner_id")
+    private User owner;
 
     public Integer getId() {
         return id;
@@ -46,5 +50,17 @@ public class Test {
 
     public void setTestTime(Date testTime) {
         this.testTime = testTime;
+    }
+
+    public String getOwner() {
+        return owner.getId();
+    }
+
+    public User OwnerInstance() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

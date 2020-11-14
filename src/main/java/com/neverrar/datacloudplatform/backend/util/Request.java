@@ -1,10 +1,10 @@
-package com.neverrar.datacloudplatform.backend.request;
+package com.neverrar.datacloudplatform.backend.util;
 
 import com.neverrar.datacloudplatform.backend.model.Project;
 
-public class ProjectRequest {
+public class Request<T> {
     private String sessionId;
-    private Project project;
+    private T data;
 
     public String getSessionId() {
         return sessionId;
@@ -14,11 +14,11 @@ public class ProjectRequest {
         this.sessionId = sessionId;
     }
 
-    public Project getProject() {
-        return project;
+    public T getData() {
+        return data;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setData(T data) {
+        this.data = data;
     }
 }

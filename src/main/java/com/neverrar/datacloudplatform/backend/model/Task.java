@@ -23,6 +23,10 @@ public class Task {
     @JoinColumn(name="project_id")
     private Project project;
 
+    @ManyToOne
+    @JoinColumn(name="owner_id")
+    private User owner;
+
     @OneToMany(mappedBy = "task",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
@@ -64,5 +68,29 @@ public class Task {
 
     public void setTestCount(Integer testCount) {
         this.testCount = testCount;
+    }
+
+    public String getOwner() {
+        return owner.getId();
+    }
+
+    public User OwnerInstance() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Integer getProject() {
+        return project.getId();
+    }
+
+    public Project ProjectInstance() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

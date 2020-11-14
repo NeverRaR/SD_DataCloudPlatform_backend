@@ -18,6 +18,15 @@ public class User {
     @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Project> projectSet;
 
+    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private Set<Task> taskSet;
+
+    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private Set<Test> testSet;
+
+    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    private Set<Tester> testerSet;
+
     public String getId() {
         return id;
     }
@@ -48,5 +57,37 @@ public class User {
 
     public void setRole(Integer role) {
         this.role = role;
+    }
+
+    public Set<Project> getProjectSet() {
+        return projectSet;
+    }
+
+    public void setProjectSet(Set<Project> projectSet) {
+        this.projectSet = projectSet;
+    }
+
+    public Set<Task> getTaskSet() {
+        return taskSet;
+    }
+
+    public void setTaskSet(Set<Task> taskSet) {
+        this.taskSet = taskSet;
+    }
+
+    public Set<Test> getTestSet() {
+        return testSet;
+    }
+
+    public void setTestSet(Set<Test> testSet) {
+        this.testSet = testSet;
+    }
+
+    public Set<Tester> getTesterSet() {
+        return testerSet;
+    }
+
+    public void setTesterSet(Set<Tester> testerSet) {
+        this.testerSet = testerSet;
     }
 }

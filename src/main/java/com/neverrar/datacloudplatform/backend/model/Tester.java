@@ -25,6 +25,10 @@ public class Tester {
     @JoinColumn(name="project_id")
     private Project project;
 
+    @ManyToOne
+    @JoinColumn(name="owner_id")
+    private User owner;
+
     @OneToMany(mappedBy = "tester",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
@@ -66,6 +70,26 @@ public class Tester {
 
     public void setDrivingYears(Double drivingYears) {
         this.drivingYears = drivingYears;
+    }
+
+    public String getOwner() {
+        return owner.getId();
+    }
+
+    public User OwnerInstance() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public Integer getProject() {
+        return project.getId();
+    }
+
+    public Project getProjectInstance() {
+        return project;
     }
 
 }
