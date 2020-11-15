@@ -1,9 +1,6 @@
 package com.neverrar.datacloudplatform.backend.controller;
 
-import com.neverrar.datacloudplatform.backend.error.InvalidSessionIdError;
-import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
-import com.neverrar.datacloudplatform.backend.error.ProjectNotExistedError;
-import com.neverrar.datacloudplatform.backend.error.UserNotExistedError;
+import com.neverrar.datacloudplatform.backend.error.*;
 import com.neverrar.datacloudplatform.backend.model.Project;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
@@ -89,7 +86,7 @@ public class ProjectController {
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> invalidateSessionId(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteProject(@RequestParam String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null) return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Project> optionalProject= projectRepository.findById(id);

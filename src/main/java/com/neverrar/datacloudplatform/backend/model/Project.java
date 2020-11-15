@@ -92,4 +92,12 @@ public class Project {
     public void setTaskSet(Set<Task> taskSet) {
         this.taskSet = taskSet;
     }
+
+    public Set<Tester> getTesterSet() {
+        return testerSet;
+    }
+
+    public void setTesterSet(Set<Tester> testerSet) {
+        this.testerSet = testerSet;
+    }
 }

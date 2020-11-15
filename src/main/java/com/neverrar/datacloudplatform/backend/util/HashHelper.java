@@ -47,6 +47,7 @@ public class HashHelper {
             encodeStr=new String(str);
             return encodeStr;
         } catch (NoSuchAlgorithmException e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
         return null;

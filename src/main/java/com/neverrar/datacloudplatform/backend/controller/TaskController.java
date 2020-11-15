@@ -98,7 +98,7 @@ public class TaskController {
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> invalidateSessionId(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteTask(@RequestParam String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Task> optionalTask=taskRepository.findById(id);

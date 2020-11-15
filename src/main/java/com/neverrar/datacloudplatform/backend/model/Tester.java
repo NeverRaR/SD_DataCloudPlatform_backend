@@ -88,8 +88,12 @@ public class Tester {
         return project.getId();
     }
 
-    public Project getProjectInstance() {
+    public Project ProjectInstance() {
         return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
 }
