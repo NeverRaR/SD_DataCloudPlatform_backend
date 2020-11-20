@@ -16,9 +16,6 @@ public class Task {
 
     private String scene;
 
-    @Column(name="test_count")
-    private Integer testCount;
-
     @ManyToOne
     @JoinColumn(name="project_id")
     private Project project;
@@ -62,14 +59,6 @@ public class Task {
         this.id = id;
     }
 
-    public Integer getTestCount() {
-        return testCount;
-    }
-
-    public void setTestCount(Integer testCount) {
-        this.testCount = testCount;
-    }
-
     public String getOwner() {
         return owner.getId();
     }
@@ -92,5 +81,13 @@ public class Task {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Set<Test> getTestSet() {
+        return testSet;
+    }
+
+    public void setTestSet(Set<Test> testSet) {
+        this.testSet = testSet;
     }
 }

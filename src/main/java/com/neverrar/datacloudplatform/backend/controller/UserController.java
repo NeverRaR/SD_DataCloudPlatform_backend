@@ -5,6 +5,7 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
 import com.neverrar.datacloudplatform.backend.util.HashHelper;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.UserInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ public class UserController {
     @Autowired
     private StringRedisTemplate template;
 
-    @PostMapping(path="/register") // Map ONLY POST Requests
+    @PostMapping // Map ONLY POST Requests
     public @ResponseBody
     Result<String> addNewUser (@RequestBody User user) {
         // @ResponseBody means the returned String is the response, not a view name
@@ -33,21 +34,35 @@ public class UserController {
         Optional<User> opt=userRepository.findById(user.getId());
         if(opt.isPresent()) return Result.wrapErrorResult(new UserAlreadyExistedError());
         User n = new User();
-        n.setUsername(user.getName());
-        n.setPassword(HashHelper.computeSha256Hash(user.getPassword()));
+        n.setNickname(user.getNickname());
+        double seed=ThreadLocalRandom.current().nextDouble();
+        n.setSalt(HashHelper.computeSha256Hash(user.getId()+ seed));
+        n.setPassword(HashHelper.computeSha256Hash(user.getPassword()+n.getSalt()));
         n.setId(user.getId());
         n.setRole(0);
         userRepository.save(n);
         return Result.wrapSuccessfulResult("Saved");
     }
 
-    @PostMapping(path="/login")
+    @GetMapping
+    public @ResponseBody
+    Result<UserInformation> getUser (@RequestParam String sessionId) {
+        // @ResponseBody means the returned String is the response, not a view name
+        // @RequestParam means it is a parameter from the GET or POST request
+        String id=template.opsForValue().get(sessionId);
+        if(id==null) return Result.wrapErrorResult(new InvalidSessionIdError());
+        Optional<User>  optionalUser=userRepository.findById(id);
+        if(!optionalUser.isPresent()) return Result.wrapErrorResult(new UserNotExistedError());
+        return Result.wrapSuccessfulResult(new UserInformation(optionalUser.get()));
+    }
+
+    @PostMapping(path="/session")
     public @ResponseBody Result<String> getLoginToken(@RequestBody User user) {
 
         String sessionId;
         Optional<User> opt=userRepository.findById(user.getId());
         if(!opt.isPresent()) return Result.wrapErrorResult(new UserNotExistedError());
-        String passwordHashed=HashHelper.computeSha256Hash(user.getPassword());
+        String passwordHashed=HashHelper.computeSha256Hash(user.getPassword()+opt.get().getSalt());
         if(!opt.get().getPassword().equals(passwordHashed)) return Result.wrapErrorResult(new WrongPasswordError());;
         double seed=ThreadLocalRandom.current().nextDouble();
         sessionId=HashHelper.computeMD5Hash(user.getId()+ seed);
@@ -56,7 +71,7 @@ public class UserController {
         return Result.wrapSuccessfulResult(sessionId);
     }
 
-    @DeleteMapping(path="/logout")
+    @DeleteMapping(path="/session")
     public @ResponseBody Result<String> invalidateSessionId(@RequestParam String sessionId) {
         String id=template.opsForValue().get(sessionId);
         if(id==null) return Result.wrapErrorResult(new InvalidSessionIdError());

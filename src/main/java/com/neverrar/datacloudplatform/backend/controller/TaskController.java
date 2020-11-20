@@ -47,7 +47,6 @@ public class TaskController {
         User user=new User();
         user.setId(userId);
         task.setOwner(user);
-        task.setTestCount(0);
         task.setId(null);
         task.setProject(optionalProject.get());
         taskRepository.save(task);
@@ -85,7 +84,6 @@ public class TaskController {
             return Result.wrapErrorResult(new PermissionDeniedError());
         Task task=request.getData();
         task.setId(id);
-        task.setTestCount(optionalTask.get().getTestCount());
         Project project=new Project();
         project.setId(optionalTask.get().getProject());
         task.setProject(project);

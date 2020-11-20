@@ -57,7 +57,7 @@ public class TesterController {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         Optional<Tester> optionalTester= testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
+        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
         if(!userId.equals(optionalTester.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
         return Result.wrapSuccessfulResult(optionalTester.get());
     }

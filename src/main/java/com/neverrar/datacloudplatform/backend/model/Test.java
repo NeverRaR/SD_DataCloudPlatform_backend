@@ -9,9 +9,6 @@ public class Test {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
 
-    @Column(name="test_order")
-    private Integer order;
-
     @Temporal(TemporalType.DATE)
     @Column(name="test_time")
     private Date testTime;
@@ -36,13 +33,6 @@ public class Test {
         this.id = id;
     }
 
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
 
     public Date getTestTime() {
         return testTime;
@@ -62,5 +52,29 @@ public class Test {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public  Integer getTester() {
+        return tester.getId();
+    }
+
+    public void setTester(Tester tester) {
+        this.tester = tester;
+    }
+
+    public Tester TesterInstance() {
+        return tester;
+    }
+
+    public Integer getTask() {
+        return task.getId();
+    }
+
+    public Task TaskInstance() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 }

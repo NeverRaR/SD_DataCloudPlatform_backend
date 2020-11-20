@@ -9,7 +9,9 @@ public class User {
     @Id
     private String id;
 
-    private String username;
+    private String salt;
+
+    private String nickname;
 
     private String password;
 
@@ -35,12 +37,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return username;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setNickname(String username) {
+        this.nickname = username;
     }
 
     public String getPassword() {
@@ -89,5 +91,13 @@ public class User {
 
     public void setTesterSet(Set<Tester> testerSet) {
         this.testerSet = testerSet;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }
