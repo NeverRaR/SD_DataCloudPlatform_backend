@@ -63,7 +63,7 @@ public class UserController {
         Optional<User> opt=userRepository.findById(user.getId());
         if(!opt.isPresent()) return Result.wrapErrorResult(new UserNotExistedError());
         String passwordHashed=HashHelper.computeSha256Hash(user.getPassword()+opt.get().getSalt());
-        if(!opt.get().getPassword().equals(passwordHashed)) return Result.wrapErrorResult(new WrongPasswordError());;
+        if(!opt.get().getPassword().equals(passwordHashed)) return Result.wrapErrorResult(new WrongPasswordError());
         double seed=ThreadLocalRandom.current().nextDouble();
         sessionId=HashHelper.computeMD5Hash(user.getId()+ seed);
         if(sessionId==null) return Result.wrapErrorResult(new NullError());
