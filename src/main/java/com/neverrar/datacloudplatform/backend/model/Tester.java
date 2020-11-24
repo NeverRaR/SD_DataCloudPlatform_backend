@@ -29,7 +29,7 @@ public class Tester {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "tester",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tester", fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
     public String getName() {

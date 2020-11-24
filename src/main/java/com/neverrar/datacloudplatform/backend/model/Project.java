@@ -27,10 +27,10 @@ public class Project {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project",fetch = FetchType.LAZY)
     private Set<Task> taskSet;
 
-    @OneToMany(mappedBy = "project",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project",fetch = FetchType.LAZY)
     private Set<Tester> testerSet;
 
     public String getName() {

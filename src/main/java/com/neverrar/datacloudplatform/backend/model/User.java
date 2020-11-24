@@ -17,16 +17,16 @@ public class User {
 
     private Integer role;
 
-    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private Set<Project> projectSet;
 
-    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private Set<Task> taskSet;
 
-    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
     private Set<Test> testSet;
 
-    @OneToMany(mappedBy = "owner",cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner",fetch = FetchType.LAZY)
     private Set<Tester> testerSet;
 
     public String getId() {

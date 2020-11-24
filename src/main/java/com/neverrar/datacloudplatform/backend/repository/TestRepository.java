@@ -1,6 +1,8 @@
 package com.neverrar.datacloudplatform.backend.repository;
 
+import com.neverrar.datacloudplatform.backend.model.Task;
 import com.neverrar.datacloudplatform.backend.model.Test;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.CrudRepository;
 
 
@@ -9,4 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface TestRepository extends CrudRepository<Test, Integer> {
 
+      @Modifying
+      void deleteByTask(Task task);
 }

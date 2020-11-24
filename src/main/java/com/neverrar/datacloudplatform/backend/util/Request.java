@@ -1,6 +1,5 @@
 package com.neverrar.datacloudplatform.backend.util;
 
-import com.neverrar.datacloudplatform.backend.model.Project;
 
 public class Request<T> {
     private String sessionId;
