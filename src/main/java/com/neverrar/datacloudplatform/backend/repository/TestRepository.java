@@ -3,6 +3,7 @@ package com.neverrar.datacloudplatform.backend.repository;
 import com.neverrar.datacloudplatform.backend.model.Task;
 import com.neverrar.datacloudplatform.backend.model.Test;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 
@@ -12,5 +13,10 @@ import org.springframework.data.repository.CrudRepository;
 public interface TestRepository extends CrudRepository<Test, Integer> {
 
       @Modifying
-      void deleteByTask(Task task);
+      @Query(value = "delete from test where task_id=?1", nativeQuery = true)
+      void deleteByTaskId(Integer taskId);
+
+      @Modifying
+      @Query(value = "delete from test where tester_id=?1", nativeQuery = true)
+      void deleteByTesterId(Integer testerId);
 }

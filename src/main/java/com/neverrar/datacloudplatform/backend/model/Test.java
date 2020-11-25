@@ -13,15 +13,15 @@ public class Test {
     @Column(name="test_time")
     private Date testTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="tester_id")
     private Tester tester;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="task_id")
     private Task task;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="owner_id")
     private User owner;
 

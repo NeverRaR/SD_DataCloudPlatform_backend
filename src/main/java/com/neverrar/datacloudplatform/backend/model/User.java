@@ -61,36 +61,20 @@ public class User {
         this.role = role;
     }
 
-    public Set<Project> getProjectSet() {
+    public Set<Project> projectSetInstance() {
         return projectSet;
     }
 
-    public void setProjectSet(Set<Project> projectSet) {
-        this.projectSet = projectSet;
-    }
-
-    public Set<Task> getTaskSet() {
+    public Set<Task> taskSetInstance() {
         return taskSet;
     }
 
-    public void setTaskSet(Set<Task> taskSet) {
-        this.taskSet = taskSet;
-    }
-
-    public Set<Test> getTestSet() {
+    public Set<Test> testSetInstance() {
         return testSet;
     }
 
-    public void setTestSet(Set<Test> testSet) {
-        this.testSet = testSet;
-    }
-
-    public Set<Tester> getTesterSet() {
+    public Set<Tester> testerSetInstance() {
         return testerSet;
-    }
-
-    public void setTesterSet(Set<Tester> testerSet) {
-        this.testerSet = testerSet;
     }
 
     public String getSalt() {

@@ -16,11 +16,11 @@ public class Task {
 
     private String scene;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="project_id")
     private Project project;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="owner_id")
     private User owner;
 
@@ -83,11 +83,8 @@ public class Task {
         this.project = project;
     }
 
-    public Set<Test> getTestSet() {
+    public Set<Test> testSetInstance() {
         return testSet;
     }
 
-    public void setTestSet(Set<Test> testSet) {
-        this.testSet = testSet;
-    }
 }

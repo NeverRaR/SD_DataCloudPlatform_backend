@@ -6,6 +6,7 @@ import com.neverrar.datacloudplatform.backend.model.Tester;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TesterRepository;
+import com.neverrar.datacloudplatform.backend.service.TesterService;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,77 +25,35 @@ public class TesterController {
     private StringRedisTemplate template;
 
     @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
-    private TesterRepository testerRepository;
+    private TesterService testerService;
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
     Result<String> addNewTester (@RequestBody  Request<Tester> request) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        Optional<Project> optionalProject=projectRepository.findById(request.getData().getProject());
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        String gender=request.getData().getGender();
-        if(gender.equals("male")||gender.equals("female")) {
-            Tester tester = request.getData();
-            User user = new User();
-            user.setId(userId);
-            tester.setOwner(user);
-            tester.setId(null);
-            tester.setProject(optionalProject.get());
-            testerRepository.save(tester);
-            return Result.wrapSuccessfulResult("Saved");
-        }
-        return Result.wrapErrorResult(new UnknownGenderError());
+        return testerService.addNewTester(request.getData(), userId);
     }
 
     @GetMapping("/{id}")
     public @ResponseBody Result<Tester> getTester (@RequestParam String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        Optional<Tester> optionalTester= testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!userId.equals(optionalTester.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalTester.get());
+        return testerService.getTester(userId,id);
     }
 
     @GetMapping
     public @ResponseBody Result<Set<Tester>> getAllTester (@RequestParam String sessionId,@RequestParam Integer projectId) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        Optional<Project> optionalProject=projectRepository.findById(projectId);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalProject.get().getTesterSet());
+        return testerService.getAllTester(userId,projectId);
     }
 
     @PutMapping("/{id}")
     public @ResponseBody Result<Tester> updateTester (@RequestBody Request<Tester> request, @PathVariable Integer id) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        Optional<Tester> optionalTester=testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTester.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        String gender=request.getData().getGender();
-        if(gender.equals("male")||gender.equals("female")) {
-            Tester tester = request.getData();
-            tester.setId(id);
-            Project project = new Project();
-            project.setId(optionalTester.get().getProject());
-            tester.setProject(project);
-            User user = new User();
-            user.setId(userId);
-            tester.setOwner(user);
-            testerRepository.save(tester);
-            return Result.wrapSuccessfulResult(tester);
-        }
-        return Result.wrapErrorResult(new UnknownGenderError());
+        return testerService.updateTester(request.getData(), id,userId);
     }
 
 
@@ -102,11 +61,6 @@ public class TesterController {
     public @ResponseBody Result<String> deleteTester(@RequestParam String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        Optional<Tester> optionalTester=testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTester.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        testerRepository.delete(optionalTester.get());
-        return Result.wrapSuccessfulResult("Deleted");
+        return testerService.deleteTester(userId,id);
     }
 }

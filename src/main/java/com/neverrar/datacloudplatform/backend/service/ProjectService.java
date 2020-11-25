@@ -39,12 +39,9 @@ public class ProjectService {
     @Autowired
     private TestRepository testRepository;
 
-
-
-
-    public Result<String> addNewProject (Project data,String userId) {
+    @Transactional
+    public Result<String> addNewProject (Project project,String userId) {
         Date date=new Date();
-        Project project=data;
         project.setCreateTime(date);
         project.setLastModified(date);
         User user=new User();
@@ -63,23 +60,21 @@ public class ProjectService {
 
     public Result<Set<Project>> getAllProject (String userId) {
         Optional<User> optionalUser= userRepository.findById(userId);
-        return optionalUser.map(user -> Result.wrapSuccessfulResult(user.getProjectSet()))
+        return optionalUser.map(user -> Result.wrapSuccessfulResult(user.projectSetInstance()))
                 .orElseGet(() -> Result.wrapErrorResult(new UserNotExistedError()));
     }
 
-    public  Result<Project> updateProject (Project data, Integer id,String userId) {
+    @Transactional
+    public  Result<Project> updateProject (Project project, Integer id,String userId) {
         Optional<Project> optionalProject= projectRepository.findById(id);
         if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
         if(!userId.equals(optionalProject.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
         Date date=new Date();
-        Project project=new Project();
         project.setId(id);
         project.setLastModified(date);
         User user=new User();
         user.setId(userId);
         project.setOwner(user);
-        project.setDescription(data.getDescription());
-        project.setName(data.getName());
         projectRepository.save(project);
         return Result.wrapSuccessfulResult(project);
     }
@@ -90,12 +85,15 @@ public class ProjectService {
         if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
         if(!userId.equals(optionalProject.get().getOwner()))
             return Result.wrapErrorResult(new PermissionDeniedError());
-        Set<Task> taskSet=optionalProject.get().getTaskSet();
+        Set<Task> taskSet=optionalProject.get().taskSetInstance();
         for(Task task:taskSet){
-            testRepository.deleteByTask(task);
+            testRepository.deleteByTaskId(task.getId());
+            for(Test test:task.testSetInstance()){
+                                           //mongoDB级联删除
+            }
         }
-        testerRepository.deleteByProject(optionalProject.get());
-        taskRepository.deleteByProject(optionalProject.get());
+        testerRepository.deleteByProjectId(optionalProject.get().getId());
+        taskRepository.deleteByProjectId(optionalProject.get().getId());
         projectRepository.delete(optionalProject.get());
         return Result.wrapSuccessfulResult("Deleted");
     }

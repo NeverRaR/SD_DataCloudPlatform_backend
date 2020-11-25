@@ -23,7 +23,7 @@ public class Project {
     @Column(name="last_modified")
     private Date lastModified; //时间
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="owner_id")
     private User owner;
 
@@ -85,7 +85,7 @@ public class Project {
         this.id = id;
     }
 
-    public Set<Task> getTaskSet() {
+    public Set<Task> taskSetInstance() {
         return taskSet;
     }
 
@@ -93,7 +93,7 @@ public class Project {
         this.taskSet = taskSet;
     }
 
-    public Set<Tester> getTesterSet() {
+    public Set<Tester> testerSetInstance() {
         return testerSet;
     }
 
