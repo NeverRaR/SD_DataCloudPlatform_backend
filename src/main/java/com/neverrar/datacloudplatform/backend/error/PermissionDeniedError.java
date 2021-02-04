@@ -6,4 +6,7 @@ public class PermissionDeniedError implements ServiceError{
     public String getMessage() {
         return "Permission is denied!";
     }
+
+    @Override
+    public Integer getCode() {return 3;}
 }

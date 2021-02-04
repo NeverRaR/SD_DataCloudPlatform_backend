@@ -6,4 +6,7 @@ public class WrongPasswordError implements ServiceError{
     public String getMessage() {
         return "Wrong password!";
     }
+
+    @Override
+    public Integer getCode() {return 11;}
 }

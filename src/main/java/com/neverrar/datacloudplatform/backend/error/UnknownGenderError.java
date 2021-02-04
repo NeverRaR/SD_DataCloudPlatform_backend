@@ -6,4 +6,8 @@ public class UnknownGenderError implements ServiceError{
     public String getMessage() {
         return "Unknown Gender!";
     }
+
+
+    @Override
+    public Integer getCode() {return 8;}
 }

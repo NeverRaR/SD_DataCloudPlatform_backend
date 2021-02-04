@@ -6,4 +6,7 @@ public class UserNotExistedError implements ServiceError{
     public String getMessage() {
         return "User isn't existed!";
     }
+
+    @Override
+    public Integer getCode() {return 10;}
 }

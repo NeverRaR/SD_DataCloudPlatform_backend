@@ -6,4 +6,7 @@ public class NullError implements ServiceError{
     public String getMessage() {
         return "Something is null!";
     }
+
+    @Override
+    public Integer getCode() {return 2;}
 }

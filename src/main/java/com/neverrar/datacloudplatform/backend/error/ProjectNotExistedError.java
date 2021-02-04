@@ -6,4 +6,7 @@ public class ProjectNotExistedError implements ServiceError{
     public String getMessage() {
         return "Project is not existed!";
     }
+
+    @Override
+    public Integer getCode() {return 4;}
 }

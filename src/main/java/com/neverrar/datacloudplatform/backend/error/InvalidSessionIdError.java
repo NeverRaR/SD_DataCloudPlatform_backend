@@ -6,4 +6,7 @@ public class InvalidSessionIdError implements ServiceError{
     public String getMessage() {
         return "SessionId is Invalid!";
     }
+
+    @Override
+    public Integer getCode() { return 1;}
 }

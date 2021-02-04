@@ -6,4 +6,7 @@ public class TestNotExistedError implements ServiceError{
     public String getMessage() {
         return "Test is not existed!";
     }
+
+    @Override
+    public Integer getCode() {return 7;}
 }

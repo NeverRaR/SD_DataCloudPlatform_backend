@@ -6,4 +6,7 @@ public class UserAlreadyExistedError implements ServiceError{
     public String getMessage() {
         return "User already existed!";
     }
+
+    @Override
+    public Integer getCode() {return 9;}
 }

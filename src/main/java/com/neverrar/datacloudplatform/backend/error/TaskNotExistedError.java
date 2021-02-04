@@ -6,4 +6,7 @@ public class TaskNotExistedError implements ServiceError{
     public String getMessage() {
         return "Task is not existed!";
     }
+
+    @Override
+    public Integer getCode() {return 5;}
 }
