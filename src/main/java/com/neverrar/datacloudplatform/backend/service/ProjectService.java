@@ -9,8 +9,11 @@ import com.neverrar.datacloudplatform.backend.model.Task;
 import com.neverrar.datacloudplatform.backend.model.Test;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.*;
+import com.neverrar.datacloudplatform.backend.request.CreateProjectRequest;
+import com.neverrar.datacloudplatform.backend.request.UpdateProjectRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,76 +28,64 @@ import java.util.Set;
 public class ProjectService {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ProjectRepository projectRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TesterRepository testerRepository;
-
-    @Autowired
-    private TestRepository testRepository;
-
     @Transactional
-    public Result<String> addNewProject (Project project,String userId) {
+    public String addNewProject (CreateProjectRequest request, User user) {
+
+        Project project=new Project();
         Date date=new Date();
         project.setCreateTime(date);
         project.setLastModified(date);
-        User user=new User();
-        user.setId(userId);
+        project.setName(request.getName());
+        project.setDescription(request.getDescription());
         project.setOwner(user);
         projectRepository.save(project);
-        return Result.wrapSuccessfulResult("Saved");
+        return "saved";
     }
 
-    public Result<Project> getProject (String userId, Integer id) {
+    public Result<ProjectInformation> getProject (User user, Integer id) {
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!userId.equals(optionalProject.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalProject.get());
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(user.getRole()==1) {
+            return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
+        }
+        if(!user.getId().equals(optionalProject.get().getOwner())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
     }
 
-    public Result<Set<Project>> getAllProject (String userId) {
-        Optional<User> optionalUser= userRepository.findById(userId);
-        return optionalUser.map(user -> Result.wrapSuccessfulResult(user.projectSetInstance()))
-                .orElseGet(() -> Result.wrapErrorResult(new UserNotExistedError()));
-    }
 
     @Transactional
-    public  Result<Project> updateProject (Project project, Integer id,String userId) {
+    public  Result<Project> updateProject (UpdateProjectRequest body, Integer id, User user) {
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!userId.equals(optionalProject.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!user.getId().equals(optionalProject.get().getOwner())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        Project project=optionalProject.get();
         Date date=new Date();
         project.setId(id);
         project.setLastModified(date);
-        User user=new User();
-        user.setId(userId);
         project.setOwner(user);
         projectRepository.save(project);
         return Result.wrapSuccessfulResult(project);
     }
 
     @Transactional
-    public Result<String> deleteProject(String userId,Integer id) {
+    public Result<String> deleteProject(User user,Integer id) {
         Optional<Project> optionalProject= projectRepository.findById(id);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!userId.equals(optionalProject.get().getOwner()))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        Set<Task> taskSet=optionalProject.get().taskSetInstance();
-        for(Task task:taskSet){
-            testRepository.deleteByTaskId(task.getId());
-            for(Test test:task.testSetInstance()){
-                                           //mongoDB级联删除
-            }
+        if(!optionalProject.isPresent()){
+            return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        testerRepository.deleteByProjectId(optionalProject.get().getId());
-        taskRepository.deleteByProjectId(optionalProject.get().getId());
-        projectRepository.delete(optionalProject.get());
+        if(!user.getId().equals(optionalProject.get().getOwner())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
         return Result.wrapSuccessfulResult("Deleted");
     }
 }

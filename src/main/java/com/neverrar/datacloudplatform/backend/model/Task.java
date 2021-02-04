@@ -24,7 +24,7 @@ public class Task {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<Test> testSet;
 
     public String getName() {

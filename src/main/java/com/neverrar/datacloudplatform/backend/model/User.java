@@ -6,6 +6,7 @@ import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class User {
+
     @Id
     private String id;
 

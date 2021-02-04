@@ -7,6 +7,7 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TaskRepository;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
+import com.neverrar.datacloudplatform.backend.service.AuthenticationService;
 import com.neverrar.datacloudplatform.backend.service.TaskService;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
@@ -23,8 +24,9 @@ import java.util.Set;
 @RequestMapping(path="api/tasks") // This means URL's start with /demo (after Application path)
 public class TaskController {
 
+
     @Autowired
-    private StringRedisTemplate template;
+    AuthenticationService authenticationService;
 
     @Autowired
     private TaskService taskService;
@@ -34,8 +36,10 @@ public class TaskController {
     public @ResponseBody
     Result<String> addNewTask (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @RequestBody  Request<Task> request) {
-        String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
         return taskService.addNewTask(request.getData(),userId);
     }
 
