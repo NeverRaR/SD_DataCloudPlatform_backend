@@ -2,6 +2,7 @@ package com.neverrar.datacloudplatform.backend.model;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Test {
@@ -25,6 +26,9 @@ public class Test {
     @JoinColumn(name="owner_id")
     private User owner;
 
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<MainData> mainDataSet;
+
     public Integer getId() {
         return id;
     }
@@ -42,8 +46,8 @@ public class Test {
         this.testTime = testTime;
     }
 
-    public String getOwner() {
-        return owner.getId();
+    public User getOwner() {
+        return owner;
     }
 
     public User OwnerInstance() {
@@ -54,8 +58,8 @@ public class Test {
         this.owner = owner;
     }
 
-    public  Integer getTester() {
-        return tester.getId();
+    public  Tester getTester() {
+        return tester;
     }
 
     public void setTester(Tester tester) {
@@ -66,8 +70,8 @@ public class Test {
         return tester;
     }
 
-    public Integer getTask() {
-        return task.getId();
+    public Task getTask() {
+        return task;
     }
 
     public Task TaskInstance() {
@@ -76,5 +80,13 @@ public class Test {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public Set<MainData> getMainDataSet() {
+        return mainDataSet;
+    }
+
+    public void setMainDataSet(Set<MainData> mainDataSet) {
+        this.mainDataSet = mainDataSet;
     }
 }

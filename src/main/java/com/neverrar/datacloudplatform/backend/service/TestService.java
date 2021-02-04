@@ -8,8 +8,10 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.TaskRepository;
 import com.neverrar.datacloudplatform.backend.repository.TestRepository;
 import com.neverrar.datacloudplatform.backend.repository.TesterRepository;
+import com.neverrar.datacloudplatform.backend.request.CreateTestRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.TestInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,53 +33,54 @@ public class TestService {
     private TestRepository testRepository;
 
 
-    public Result<String> addNewTest (Test test,String userId) {
+    public Result<TestInformation> addNewTest (CreateTestRequest body, User user) {
 
-        Optional<Tester> optionalTester=testerRepository.findById(test.getTester());
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTester.get().getOwner().equals(userId))
+        Optional<Tester> optionalTester=testerRepository.findById(body.getTaskId());
+        if(!optionalTester.isPresent()) {
+            return Result.wrapErrorResult(new TesterNotExistedError());
+        }
+        if(!optionalTester.get().getOwner().getId().equals(user.getId())){
             return Result.wrapErrorResult(new PermissionDeniedError());
-        Optional<Task> optionalTask=taskRepository.findById(test.getTask());
-        if(!optionalTask.isPresent()) return Result.wrapErrorResult(new TaskNotExistedError());
-        if(!optionalTask.get().getOwner().equals(userId))
+        }
+        Optional<Task> optionalTask=taskRepository.findById(body.getTaskId());
+        if(!optionalTask.isPresent()) {
+            return Result.wrapErrorResult(new TaskNotExistedError());
+        }
+        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        test.setId(null);
-        User user=new User();
-        user.setId(userId);
+        }
+        Test test=new Test();
         test.setOwner(user);
         test.setTask(optionalTask.get());
         test.setTester(optionalTester.get());
         test.setTestTime(new Date());
         testRepository.save(test);
 
-        return Result.wrapSuccessfulResult("Saved");
+        return Result.wrapSuccessfulResult(new TestInformation(test));
     }
 
-    public Result<Test> getTest (String userId,Integer id) {
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
+    public Result<TestInformation> getTest (User user,Integer id) {
         Optional<Test> optionalTest= testRepository.findById(id);
-        if(!optionalTest.isPresent()) return Result.wrapErrorResult(new TestNotExistedError());
-        if(!userId.equals(optionalTest.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalTest.get());
-    }
-
-    public Result<Set<Test>> getAllTest (String userId, Integer taskId) {
-        Optional<Task> optionalTask=taskRepository.findById(taskId);
-        if(!optionalTask.isPresent()) return Result.wrapErrorResult(new TaskNotExistedError());
-        if(!optionalTask.get().getOwner().equals(userId))
+        if(!optionalTest.isPresent()) {
+            return Result.wrapErrorResult(new TestNotExistedError());
+        }
+        if(user.getRole().equals(1)) return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
+        if(!user.getId().equals(optionalTest.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalTask.get().testSetInstance());
+        }
+        return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
     }
 
-    public Result<String> deleteTest(String userId,Integer id) {
+
+    public Result<String> deleteTest(User user,Integer id) {
         Optional<Test> optionalTest=testRepository.findById(id);
-        if(!optionalTest.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTest.get().getOwner().equals(userId))
+        if(!optionalTest.isPresent()) {
+            return Result.wrapErrorResult(new TesterNotExistedError());
+        }
+        if(!optionalTest.get().getOwner().getId().equals(user.getId())){
             return Result.wrapErrorResult(new PermissionDeniedError());
+        }
         testRepository.delete(optionalTest.get());
-
-                       //mongoDB级联删除
-
         return Result.wrapSuccessfulResult("Deleted");
     }
 }
