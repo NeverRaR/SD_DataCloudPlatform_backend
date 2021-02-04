@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller // This means that this class is a Controller
-@RequestMapping(path="/tasks") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="api/tasks") // This means URL's start with /demo (after Application path)
 public class TaskController {
 
     @Autowired

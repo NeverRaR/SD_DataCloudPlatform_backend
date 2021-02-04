@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller // This means that this class is a Controller
-@RequestMapping(path="/projects") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="api/projects") // This means URL's start with /demo (after Application path)
 public class ProjectController {
     @Autowired
     private ProjectService projectService;

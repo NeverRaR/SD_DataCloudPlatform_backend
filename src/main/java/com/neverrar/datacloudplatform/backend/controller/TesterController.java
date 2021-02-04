@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller // This means that this class is a Controller
-@RequestMapping(path="/testers") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="api/testers") // This means URL's start with /demo (after Application path)
 public class TesterController {
 
     @Autowired
