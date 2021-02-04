@@ -29,6 +29,15 @@ public class Test {
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<MainData> mainDataSet;
 
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<LogEventData> logEventDataSet;
+
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<InteractionBehaviourData> interactionBehaviourDataSet;
+
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<MarkData> markDataSet;
+
     public Integer getId() {
         return id;
     }
@@ -88,5 +97,29 @@ public class Test {
 
     public void setMainDataSet(Set<MainData> mainDataSet) {
         this.mainDataSet = mainDataSet;
+    }
+
+    public Set<LogEventData> getLogEventDataSet() {
+        return logEventDataSet;
+    }
+
+    public void setLogEventDataSet(Set<LogEventData> logEventDataSet) {
+        this.logEventDataSet = logEventDataSet;
+    }
+
+    public Set<InteractionBehaviourData> getInteractionBehaviourDataSet() {
+        return interactionBehaviourDataSet;
+    }
+
+    public void setInteractionBehaviourDataSet(Set<InteractionBehaviourData> interactionBehaviourDataSet) {
+        this.interactionBehaviourDataSet = interactionBehaviourDataSet;
+    }
+
+    public Set<MarkData> getMarkDataSet() {
+        return markDataSet;
+    }
+
+    public void setMarkDataSet(Set<MarkData> markDataSet) {
+        this.markDataSet = markDataSet;
     }
 }
