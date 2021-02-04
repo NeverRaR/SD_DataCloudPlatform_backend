@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +59,8 @@ public class UserController {
     }
 
     @PostMapping(path="/session")
-    public @ResponseBody Result<String> getLoginToken(@RequestBody User user) {
+    public @ResponseBody Result<String> getLoginToken(@RequestBody User user,
+                                                      HttpServletResponse response, HttpServletRequest request) {
 
         String sessionId;
         Optional<User> opt=userRepository.findById(user.getId());

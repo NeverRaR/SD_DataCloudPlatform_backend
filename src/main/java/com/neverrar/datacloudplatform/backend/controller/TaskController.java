@@ -32,28 +32,32 @@ public class TaskController {
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
-    Result<String> addNewTask (@RequestBody  Request<Task> request) {
+    Result<String> addNewTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @RequestBody  Request<Task> request) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return taskService.addNewTask(request.getData(),userId);
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody Result<Task> getTask (@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<Task> getTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return taskService.getTask(userId,id);
     }
 
     @GetMapping
-    public @ResponseBody Result<Set<Task>> getAllTask (@RequestParam String sessionId,@RequestParam Integer projectId) {
+    public @ResponseBody Result<Set<Task>> getAllTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestParam Integer projectId) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return taskService.getAllTask(userId,projectId);
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody Result<Task> updateTask (@RequestBody Request<Task> request, @PathVariable Integer id) {
+    public @ResponseBody Result<Task> updateTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestBody Request<Task> request, @PathVariable Integer id) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return taskService.updateTask(request.getData(),id,userId);
@@ -61,7 +65,8 @@ public class TaskController {
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> deleteTask(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteTask(@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return taskService.deleteTask(userId,id);

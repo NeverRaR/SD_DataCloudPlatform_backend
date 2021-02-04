@@ -38,29 +38,33 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody Result<Project> getProject (@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<Project> getProject (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return projectService.getProject(userId,id);
     }
 
     @GetMapping
-    public @ResponseBody Result<Set<Project>> getAllProject (@RequestParam String sessionId) {
+    public @ResponseBody Result<Set<Project>> getAllProject (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return projectService.getAllProject(userId);
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody Result<Project> updateProject (@RequestBody Request<Project> request, @PathVariable Integer id) {
-        String userId=template.opsForValue().get(request.getSessionId());
+    public @ResponseBody Result<Project> updateProject (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestBody Project request, @PathVariable Integer id) {
+        String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return projectService.updateProject(request.getData(),id,userId);
+        return projectService.updateProject(request,id,userId);
     }
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> deleteProject(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteProject(@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null) return Result.wrapErrorResult(new InvalidSessionIdError());
         return projectService.deleteProject(userId,id);

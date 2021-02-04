@@ -30,28 +30,32 @@ public class TestController {
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
-    Result<String> addNewTest (@RequestBody  Request<Test> request) {
+    Result<String> addNewTest (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestBody  Request<Test> request) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testService.addNewTest(request.getData(), userId);
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody Result<Test> getTest (@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<Test> getTest (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testService.getTest(userId,id);
     }
 
     @GetMapping
-    public @ResponseBody Result<Set<Test>> getAllTest (@RequestParam String sessionId,@RequestParam Integer taskId) {
+    public @ResponseBody Result<Set<Test>> getAllTest (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestParam Integer taskId) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testService.getAllTest(userId,taskId);
     }
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> deleteTest(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteTest(@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testService.deleteTest(userId,id);

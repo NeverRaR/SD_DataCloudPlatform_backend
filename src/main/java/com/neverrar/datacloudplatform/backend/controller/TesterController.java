@@ -29,28 +29,32 @@ public class TesterController {
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
-    Result<String> addNewTester (@RequestBody  Request<Tester> request) {
+    Result<String> addNewTester (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestBody  Request<Tester> request) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testerService.addNewTester(request.getData(), userId);
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody Result<Tester> getTester (@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<Tester> getTester (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testerService.getTester(userId,id);
     }
 
     @GetMapping
-    public @ResponseBody Result<Set<Tester>> getAllTester (@RequestParam String sessionId,@RequestParam Integer projectId) {
+    public @ResponseBody Result<Set<Tester>> getAllTester (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestParam Integer projectId) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testerService.getAllTester(userId,projectId);
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody Result<Tester> updateTester (@RequestBody Request<Tester> request, @PathVariable Integer id) {
+    public @ResponseBody Result<Tester> updateTester (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@RequestBody Request<Tester> request, @PathVariable Integer id) {
         String userId=template.opsForValue().get(request.getSessionId());
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testerService.updateTester(request.getData(), id,userId);
@@ -58,7 +62,8 @@ public class TesterController {
 
 
     @DeleteMapping(path="/{id}")
-    public @ResponseBody Result<String> deleteTester(@RequestParam String sessionId,@PathVariable Integer id) {
+    public @ResponseBody Result<String> deleteTester(@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
         String userId=template.opsForValue().get(sessionId);
         if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
         return testerService.deleteTester(userId,id);
