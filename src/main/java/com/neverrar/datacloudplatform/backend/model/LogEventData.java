@@ -14,8 +14,10 @@ public class LogEventData {
 
     private String type;
 
+    @Column(name = "drive_from")
     private String from;
 
+    @Column(name = "drive_to")
     private String to;
 
     @Temporal(TemporalType.TIMESTAMP)
