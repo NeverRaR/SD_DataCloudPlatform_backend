@@ -1,8 +1,5 @@
 package com.neverrar.datacloudplatform.backend.model;
 
-import com.neverrar.datacloudplatform.backend.model.Project;
-import com.neverrar.datacloudplatform.backend.model.Test;
-
 import javax.persistence.*;
 import java.util.Set;
 

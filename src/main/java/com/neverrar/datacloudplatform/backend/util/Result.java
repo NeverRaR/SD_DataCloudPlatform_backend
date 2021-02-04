@@ -16,6 +16,8 @@ public class Result<T> implements Serializable {
 
     private String message;
 
+    private Integer code;
+
     public Result() {
     }
 
@@ -40,6 +42,7 @@ public class Result<T> implements Serializable {
         Result<T> result = new Result<T>();
         result.success = false;
         result.message = error.getMessage();
+        result.code=error.getCode();
         result.timestamp=new Date();
         return result;
     }
@@ -48,6 +51,7 @@ public class Result<T> implements Serializable {
         Result<T> result = new Result<T>();
         result.success = false;
         result.message = String.format(error.getMessage(), extendMsg);
+        result.code= error.getCode();
         result.timestamp=new Date();
         return result;
     }
@@ -93,5 +97,13 @@ public class Result<T> implements Serializable {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 }
