@@ -1,19 +1,18 @@
 package com.neverrar.datacloudplatform.backend.view;
 
 import com.neverrar.datacloudplatform.backend.model.User;
+import lombok.Data;
 
+@Data
 public class UserInformation {
-    private User user;
+    private Integer role;
+    private String nickName;
+    private String id;
     public UserInformation(User user){
-        this.user=user;
+
+        this.role=user.getRole();
+        this.nickName=user.getNickname();
+        this.id=user.getId();
     }
-    public int getRole(){
-        return user.getRole();
-    }
-    public String getNickname(){
-        return user.getNickname();
-    }
-    public String getId(){
-        return user.getId();
-    }
+
 }

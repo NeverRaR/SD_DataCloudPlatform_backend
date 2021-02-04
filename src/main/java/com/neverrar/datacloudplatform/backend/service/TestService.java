@@ -64,7 +64,9 @@ public class TestService {
         if(!optionalTest.isPresent()) {
             return Result.wrapErrorResult(new TestNotExistedError());
         }
-        if(user.getRole().equals(1)) return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
+        if(user.getRole().equals(1)) {
+            return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
+        }
         if(!user.getId().equals(optionalTest.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
