@@ -31,7 +31,7 @@ public class ProjectService {
     private ProjectRepository projectRepository;
 
     @Transactional
-    public String addNewProject (CreateProjectRequest request, User user) {
+    public  Result<ProjectInformation> addNewProject (CreateProjectRequest request, User user) {
 
         Project project=new Project();
         Date date=new Date();
@@ -41,7 +41,7 @@ public class ProjectService {
         project.setDescription(request.getDescription());
         project.setOwner(user);
         projectRepository.save(project);
-        return "saved";
+        return Result.wrapSuccessfulResult(new ProjectInformation(project));
     }
 
     public Result<ProjectInformation> getProject (User user, Integer id) {
@@ -60,7 +60,7 @@ public class ProjectService {
 
 
     @Transactional
-    public  Result<Project> updateProject (UpdateProjectRequest body, Integer id, User user) {
+    public  Result<ProjectInformation> updateProject (UpdateProjectRequest body, Integer id, User user) {
         Optional<Project> optionalProject= projectRepository.findById(id);
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
@@ -74,7 +74,7 @@ public class ProjectService {
         project.setLastModified(date);
         project.setOwner(user);
         projectRepository.save(project);
-        return Result.wrapSuccessfulResult(project);
+        return Result.wrapSuccessfulResult(new ProjectInformation(project));
     }
 
     @Transactional

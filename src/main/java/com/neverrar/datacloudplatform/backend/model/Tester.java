@@ -18,6 +18,8 @@ public class Tester {
     @Column(name="driving_years")
     private Double drivingYears;
 
+    private Integer age;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="project_id")
     private Project project;
@@ -69,8 +71,8 @@ public class Tester {
         this.drivingYears = drivingYears;
     }
 
-    public String getOwner() {
-        return owner.getId();
+    public User getOwner() {
+        return owner;
     }
 
     public User OwnerInstance() {
@@ -99,5 +101,13 @@ public class Tester {
 
     public void setTestSet(Set<Test> testSet) {
         this.testSet = testSet;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

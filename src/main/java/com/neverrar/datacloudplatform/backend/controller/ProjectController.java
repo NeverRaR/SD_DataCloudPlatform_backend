@@ -35,13 +35,13 @@ public class ProjectController {
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
-    Result<String> addNewProject (@CookieValue(value = "sessionId",
+    Result<ProjectInformation> addNewProject (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId,@RequestBody CreateProjectRequest body) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return Result.wrapSuccessfulResult(projectService.addNewProject(body,user));
+        return projectService.addNewProject(body,user);
     }
 
     @GetMapping("/{id}")
@@ -55,7 +55,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody Result<Project> updateProject (@CookieValue(value = "sessionId",
+    public @ResponseBody Result<ProjectInformation> updateProject (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @RequestBody UpdateProjectRequest body,
                                                         @PathVariable Integer id) {
         User user=authenticationService.getUser(sessionId);

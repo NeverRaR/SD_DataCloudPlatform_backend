@@ -8,7 +8,11 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TestRepository;
 import com.neverrar.datacloudplatform.backend.repository.TesterRepository;
+import com.neverrar.datacloudplatform.backend.request.CreateTaskRequest;
+import com.neverrar.datacloudplatform.backend.request.CreateTesterRequest;
+import com.neverrar.datacloudplatform.backend.request.UpdateTesterRequest;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.TesterInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,71 +33,72 @@ public class TesterService {
     private TestRepository testRepository;
 
     @Transactional
-    public Result<String> addNewTester (Tester tester,String userId) {
-        Optional<Project> optionalProject=projectRepository.findById(tester.getProject());
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
+    public Result<TesterInformation> addNewTester (CreateTesterRequest body, User user) {
+        Optional<Project> optionalProject=projectRepository.findById(body.getProjectId());
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!optionalProject.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        String gender=tester.getGender();
+        }
+        String gender=body.getGender();
+        Tester tester=new Tester();
         if("male".equals(gender)|| "female".equals(gender)) {
-            User user = new User();
-            user.setId(userId);
             tester.setOwner(user);
-            tester.setId(null);
             tester.setProject(optionalProject.get());
+            tester.setDrivingYears(body.getDrivingYears());
+            tester.setEducation(body.getEducation());
+            tester.setGender(body.getGender());
+            tester.setName(body.getName());
+            tester.setAge(body.getAge());
             testerRepository.save(tester);
-            return Result.wrapSuccessfulResult("Saved");
+            return Result.wrapSuccessfulResult(new TesterInformation(tester));
         }
         return Result.wrapErrorResult(new UnknownGenderError());
     }
 
-    public Result<Tester> getTester ( String userId, Integer id) {
+    public Result<TesterInformation> getTester ( User user, Integer id) {
         Optional<Tester> optionalTester= testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!userId.equals(optionalTester.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalTester.get());
+        if(!optionalTester.isPresent()) {
+            return Result.wrapErrorResult(new TesterNotExistedError());
+        }
+        if(!user.getId().equals(optionalTester.get().getOwner().getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        return Result.wrapSuccessfulResult(new TesterInformation(optionalTester.get()));
     }
 
-    public Result<Set<Tester>> getAllTester (String userId,Integer projectId) {
-        Optional<Project> optionalProject=projectRepository.findById(projectId);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalProject.get().testerSetInstance());
-    }
 
     @Transactional
-    public Result<Tester> updateTester (Tester tester, Integer id,String userId) {
+    public Result<TesterInformation> updateTester (UpdateTesterRequest body, Integer id, User user) {
         Optional<Tester> optionalTester=testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTester.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        String gender=tester.getGender();
-        if(gender.equals("male")||gender.equals("female")) {
-            tester.setId(id);
-            Project project = new Project();
-            project.setId(optionalTester.get().getProject());
-            tester.setProject(project);
-            User user = new User();
-            user.setId(userId);
-            tester.setOwner(user);
+        if(!optionalTester.isPresent()) {
+            return Result.wrapErrorResult(new TesterNotExistedError());
+        }
+        String gender=body.getGender();
+        Tester tester=new Tester();
+        if("male".equals(gender)|| "female".equals(gender)) {
+            tester.setDrivingYears(body.getDrivingYears());
+            tester.setEducation(body.getEducation());
+            tester.setGender(body.getGender());
+            tester.setName(body.getName());
+            tester.setAge(body.getAge());
             testerRepository.save(tester);
-            return Result.wrapSuccessfulResult(tester);
+            return Result.wrapSuccessfulResult(new TesterInformation(tester));
         }
         return Result.wrapErrorResult(new UnknownGenderError());
     }
 
     @Transactional
-    public Result<String> deleteTester(String userId,Integer id) {
+    public Result<String> deleteTester(User user,Integer id) {
 
         Optional<Tester> optionalTester=testerRepository.findById(id);
-        if(!optionalTester.isPresent()) return Result.wrapErrorResult(new TesterNotExistedError());
-        if(!optionalTester.get().getOwner().equals(userId))
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        for(Test test: optionalTester.get().testSetInstance()){
-                       //mongoDB级联删除
+        if(!optionalTester.isPresent()) {
+            return Result.wrapErrorResult(new TesterNotExistedError());
         }
-        testRepository.deleteByTesterId(id);
+        if(!optionalTester.get().getOwner().getId().equals(user.getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
         testerRepository.delete(optionalTester.get());
         return Result.wrapSuccessfulResult("Deleted");
     }

@@ -37,7 +37,7 @@ public class TaskController {
 
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
-    Result<String> addNewTask (@CookieValue(value = "sessionId",
+    Result<TaskInformation> addNewTask (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @RequestBody CreateTaskRequest body) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
@@ -58,7 +58,7 @@ public class TaskController {
 
 
     @PutMapping("/{id}")
-    public @ResponseBody Result<Task> updateTask (@CookieValue(value = "sessionId",
+    public @ResponseBody Result<TaskInformation> updateTask (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @RequestBody UpdateTaskRequest body
             , @PathVariable Integer id) {
         User user=authenticationService.getUser(sessionId);

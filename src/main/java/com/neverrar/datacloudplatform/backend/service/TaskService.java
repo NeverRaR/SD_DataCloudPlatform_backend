@@ -36,7 +36,7 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Result<String> addNewTask (CreateTaskRequest body, User user) {
+    public Result<TaskInformation> addNewTask (CreateTaskRequest body, User user) {
         Optional<Project> optionalProject=projectRepository.findById(body.getProjectId());
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
@@ -51,7 +51,7 @@ public class TaskService {
         task.setName(body.getName());
         task.setScene(body.getScene());
         taskRepository.save(task);
-        return Result.wrapSuccessfulResult("Saved");
+        return Result.wrapSuccessfulResult(new TaskInformation(task));
     }
 
     public Result<TaskInformation> getTask (User user, Integer id) {
@@ -65,7 +65,7 @@ public class TaskService {
         return Result.wrapSuccessfulResult(new TaskInformation(optionalTask.get()));
     }
 
-    public Result<Task> updateTask (UpdateTaskRequest body, Integer id, User user) {
+    public Result<TaskInformation> updateTask (UpdateTaskRequest body, Integer id, User user) {
         Optional<Task> optionalTask=taskRepository.findById(id);
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
@@ -78,7 +78,7 @@ public class TaskService {
         task.setName(body.getName());
         task.setDescription(body.getDescription());
         taskRepository.save(task);
-        return Result.wrapSuccessfulResult(task);
+        return Result.wrapSuccessfulResult(new TaskInformation(task));
     }
 
 
