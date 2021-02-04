@@ -66,13 +66,10 @@ public class Project {
         this.lastModified = lastModified;
     }
 
-    public String getOwner() {
-        return owner.getId();
-    }
-
-    public User OwnerInstance() {
+    public User getOwner() {
         return owner;
     }
+
 
     public void setOwner(User owner) {
         this.owner = owner;

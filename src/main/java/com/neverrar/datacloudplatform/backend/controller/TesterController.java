@@ -6,6 +6,7 @@ import com.neverrar.datacloudplatform.backend.model.Tester;
 import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TesterRepository;
+import com.neverrar.datacloudplatform.backend.service.AuthenticationService;
 import com.neverrar.datacloudplatform.backend.service.TesterService;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
@@ -22,7 +23,7 @@ import java.util.Set;
 public class TesterController {
 
     @Autowired
-    private StringRedisTemplate template;
+    AuthenticationService authenticationService;
 
     @Autowired
     private TesterService testerService;
@@ -31,9 +32,11 @@ public class TesterController {
     public @ResponseBody
     Result<String> addNewTester (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId,@RequestBody  Request<Tester> request) {
-        String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return testerService.addNewTester(request.getData(), userId);
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return testerService.addNewTester(request.getData(), user);
     }
 
     @GetMapping("/{id}")

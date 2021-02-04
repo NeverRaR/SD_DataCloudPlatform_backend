@@ -59,8 +59,8 @@ public class Task {
         this.id = id;
     }
 
-    public String getOwner() {
-        return owner.getId();
+    public User getOwner() {
+        return owner;
     }
 
     public User OwnerInstance() {
@@ -71,8 +71,8 @@ public class Task {
         this.owner = owner;
     }
 
-    public Integer getProject() {
-        return project.getId();
+    public Project getProject() {
+        return project;
     }
 
     public Project ProjectInstance() {

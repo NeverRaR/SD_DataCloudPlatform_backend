@@ -35,7 +35,7 @@ public class TesterService {
         if(!optionalProject.get().getOwner().equals(userId))
             return Result.wrapErrorResult(new PermissionDeniedError());
         String gender=tester.getGender();
-        if(gender.equals("male")||gender.equals("female")) {
+        if("male".equals(gender)|| "female".equals(gender)) {
             User user = new User();
             user.setId(userId);
             tester.setOwner(user);

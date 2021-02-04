@@ -11,8 +11,11 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TaskRepository;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
+import com.neverrar.datacloudplatform.backend.request.CreateTaskRequest;
+import com.neverrar.datacloudplatform.backend.request.UpdateTaskRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.TaskInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -33,59 +36,59 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Result<String> addNewTask (Task task,String userId) {
-        Optional<Project> optionalProject=projectRepository.findById(task.getProject());
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
+    public Result<String> addNewTask (CreateTaskRequest body, User user) {
+        Optional<Project> optionalProject=projectRepository.findById(body.getProjectId());
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!optionalProject.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        User user=new User();
-        user.setId(userId);
+        }
+        Task task=new Task();
         task.setOwner(user);
-        task.setId(null);
         task.setProject(optionalProject.get());
+        task.setDescription(body.getDescription());
+        task.setName(body.getName());
+        task.setScene(body.getScene());
         taskRepository.save(task);
         return Result.wrapSuccessfulResult("Saved");
     }
 
-    public Result<Task> getTask (String userId,Integer id) {
+    public Result<TaskInformation> getTask (User user, Integer id) {
         Optional<Task> optionalTask= taskRepository.findById(id);
-        if(!optionalTask.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!userId.equals(optionalTask.get().getOwner())) return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalTask.get());
-    }
-
-    public Result<Set<Task>> getAllTask (String  userId, Integer projectId) {
-        Optional<Project> optionalProject=projectRepository.findById(projectId);
-        if(!optionalProject.isPresent()) return Result.wrapErrorResult(new ProjectNotExistedError());
-        if(!optionalProject.get().getOwner().equals(userId))
+        if(!optionalTask.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!user.getId().equals(optionalTask.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        return Result.wrapSuccessfulResult(optionalProject.get().taskSetInstance());
+        }
+        return Result.wrapSuccessfulResult(new TaskInformation(optionalTask.get()));
     }
 
-    public Result<Task> updateTask (Task task, Integer id,String userId) {
+    public Result<Task> updateTask (UpdateTaskRequest body, Integer id, User user) {
         Optional<Task> optionalTask=taskRepository.findById(id);
-        if(!optionalTask.isPresent()) return Result.wrapErrorResult(new TaskNotExistedError());
-        if(!optionalTask.get().getOwner().equals(userId))
+        if(!optionalTask.isPresent()) {
+            return Result.wrapErrorResult(new TaskNotExistedError());
+        }
+        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        task.setId(id);
-        Project project=new Project();
-        project.setId(optionalTask.get().getProject());
-        task.setProject(project);
-        User user=new User();
-        user.setId(userId);
-        task.setOwner(user);
+        }
+        Task task=new Task();
+        task.setScene(body.getScene());
+        task.setName(body.getName());
+        task.setDescription(body.getDescription());
         taskRepository.save(task);
         return Result.wrapSuccessfulResult(task);
     }
 
 
-    public Result<String> deleteTask(String userId,Integer id) {
+    public Result<String> deleteTask(User user,Integer id) {
         Optional<Task> optionalTask=taskRepository.findById(id);
-        if(!optionalTask.isPresent()) return Result.wrapErrorResult(new TaskNotExistedError());
-        if(!optionalTask.get().getOwner().equals(userId))
+        if(!optionalTask.isPresent()) {
+            return Result.wrapErrorResult(new TaskNotExistedError());
+        }
+        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
-        for(Test test:optionalTask.get().testSetInstance()){
-                      //mongoDB级联删除
         }
         taskRepository.delete(optionalTask.get());
         return Result.wrapSuccessfulResult("Deleted");

@@ -7,10 +7,13 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TaskRepository;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
+import com.neverrar.datacloudplatform.backend.request.CreateTaskRequest;
+import com.neverrar.datacloudplatform.backend.request.UpdateTaskRequest;
 import com.neverrar.datacloudplatform.backend.service.AuthenticationService;
 import com.neverrar.datacloudplatform.backend.service.TaskService;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.TaskInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -35,44 +38,44 @@ public class TaskController {
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
     Result<String> addNewTask (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId, @RequestBody  Request<Task> request) {
+            defaultValue = "noSession") String sessionId, @RequestBody CreateTaskRequest body) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return taskService.addNewTask(request.getData(),userId);
+        return taskService.addNewTask(body,user);
     }
 
     @GetMapping("/{id}")
-    public @ResponseBody Result<Task> getTask (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
-        String userId=template.opsForValue().get(sessionId);
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return taskService.getTask(userId,id);
+    public @ResponseBody Result<TaskInformation> getTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return taskService.getTask(user,id);
     }
 
-    @GetMapping
-    public @ResponseBody Result<Set<Task>> getAllTask (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId,@RequestParam Integer projectId) {
-        String userId=template.opsForValue().get(sessionId);
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return taskService.getAllTask(userId,projectId);
-    }
 
     @PutMapping("/{id}")
     public @ResponseBody Result<Task> updateTask (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId,@RequestBody Request<Task> request, @PathVariable Integer id) {
-        String userId=template.opsForValue().get(request.getSessionId());
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return taskService.updateTask(request.getData(),id,userId);
+            defaultValue = "noSession") String sessionId, @RequestBody UpdateTaskRequest body
+            , @PathVariable Integer id) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return taskService.updateTask(body,id,user);
     }
 
 
     @DeleteMapping(path="/{id}")
     public @ResponseBody Result<String> deleteTask(@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId,@PathVariable Integer id) {
-        String userId=template.opsForValue().get(sessionId);
-        if(userId==null)  return Result.wrapErrorResult(new InvalidSessionIdError());
-        return taskService.deleteTask(userId,id);
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return taskService.deleteTask(user,id);
     }
 }
