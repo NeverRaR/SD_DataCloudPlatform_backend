@@ -52,7 +52,7 @@ public class ProjectService {
         if(user.getRole()==1) {
             return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
         }
-        if(!user.getId().equals(optionalProject.get().getOwner())) {
+        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
@@ -65,7 +65,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner())) {
+        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Project project=optionalProject.get();
@@ -83,7 +83,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()){
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner())) {
+        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         return Result.wrapSuccessfulResult("Deleted");
