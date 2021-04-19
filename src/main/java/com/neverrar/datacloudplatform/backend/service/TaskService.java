@@ -73,7 +73,7 @@ public class TaskService {
         if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
-        Task task=new Task();
+        Task task=optionalTask.get();
         task.setScene(body.getScene());
         task.setName(body.getName());
         task.setDescription(body.getDescription());
