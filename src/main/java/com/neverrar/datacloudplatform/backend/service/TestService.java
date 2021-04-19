@@ -35,7 +35,7 @@ public class TestService {
 
     public Result<TestInformation> addNewTest (CreateTestRequest body, User user) {
 
-        Optional<Tester> optionalTester=testerRepository.findById(body.getTaskId());
+        Optional<Tester> optionalTester=testerRepository.findById(body.getTesterId());
         if(!optionalTester.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
