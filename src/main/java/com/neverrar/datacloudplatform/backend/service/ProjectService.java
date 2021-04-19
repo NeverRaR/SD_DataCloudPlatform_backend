@@ -13,6 +13,7 @@ import com.neverrar.datacloudplatform.backend.request.CreateProjectRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateProjectRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
 import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -58,6 +59,15 @@ public class ProjectService {
         return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
     }
 
+
+    public Result<AllProjectInfoByUser> getOwnedProject (User user) {
+        if (user == null) {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        AllProjectInfoByUser result=new AllProjectInfoByUser(user.projectSetInstance());
+        result.setUserId(user.getId());
+        return Result.wrapSuccessfulResult(result);
+    }
 
     @Transactional
     public  Result<ProjectInformation> updateProject (UpdateProjectRequest body, Integer id, User user) {
