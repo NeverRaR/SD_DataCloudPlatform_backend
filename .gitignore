@@ -6,6 +6,7 @@ target/
 
 ###Configuration###
 application.properties
+*.txt
 
 ### STS ###
 .apt_generated
