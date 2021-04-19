@@ -76,7 +76,7 @@ public class TesterService {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
         String gender=body.getGender();
-        Tester tester=new Tester();
+        Tester tester=optionalTester.get();
         if("male".equals(gender)|| "female".equals(gender)) {
             tester.setDrivingYears(body.getDrivingYears());
             tester.setEducation(body.getEducation());

@@ -67,6 +67,16 @@ public class ProjectController {
     }
 
 
+    @GetMapping("{id}/testers")
+    public @ResponseBody Result<AllTaskByProject> getOwnedTask (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return  projectService.getOwnedTask(user,id);
+    }
+
     @GetMapping("/{id}")
     public @ResponseBody Result<ProjectInformation> getProject (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
