@@ -15,6 +15,7 @@ import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
 import com.neverrar.datacloudplatform.backend.view.AllTaskByProject;
+import com.neverrar.datacloudplatform.backend.view.AllTesterByProject;
 import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -79,6 +80,20 @@ public class ProjectService {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         AllTaskByProject result=new AllTaskByProject(optionalProject.get().taskSetInstance());
+        result.setProjectId(optionalProject.get().getId());
+        return Result.wrapSuccessfulResult(result);
+
+    }
+
+    public Result<AllTesterByProject> getOwnedTester (User user, Integer id) {
+        Optional<Project> optionalProject= projectRepository.findById(id);
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        AllTesterByProject result=new AllTesterByProject(optionalProject.get().testerSetInstance());
         result.setProjectId(optionalProject.get().getId());
         return Result.wrapSuccessfulResult(result);
 

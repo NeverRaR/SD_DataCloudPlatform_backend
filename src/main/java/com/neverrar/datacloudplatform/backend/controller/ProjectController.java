@@ -13,6 +13,7 @@ import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
 import com.neverrar.datacloudplatform.backend.view.AllTaskByProject;
+import com.neverrar.datacloudplatform.backend.view.AllTesterByProject;
 import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -68,13 +69,13 @@ public class ProjectController {
 
 
     @GetMapping("{id}/testers")
-    public @ResponseBody Result<AllTaskByProject> getOwnedTask (@CookieValue(value = "sessionId",
+    public @ResponseBody Result<AllTesterByProject> getOwnedTester (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return  projectService.getOwnedTask(user,id);
+        return  projectService.getOwnedTester(user,id);
     }
 
     @GetMapping("/{id}")
