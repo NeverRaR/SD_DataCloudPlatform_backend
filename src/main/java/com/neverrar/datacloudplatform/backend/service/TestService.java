@@ -11,10 +11,12 @@ import com.neverrar.datacloudplatform.backend.repository.TesterRepository;
 import com.neverrar.datacloudplatform.backend.request.CreateTestRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
 import com.neverrar.datacloudplatform.backend.view.TestInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -33,6 +35,7 @@ public class TestService {
     private TestRepository testRepository;
 
 
+    @Transactional
     public Result<TestInformation> addNewTest (CreateTestRequest body, User user) {
 
         Optional<Tester> optionalTester=testerRepository.findById(body.getTesterId());
@@ -72,6 +75,7 @@ public class TestService {
         }
         return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
     }
+
 
 
     public Result<String> deleteTest(User user,Integer id) {

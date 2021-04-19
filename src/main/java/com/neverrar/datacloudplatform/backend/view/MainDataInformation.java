@@ -46,6 +46,7 @@ public class MainDataInformation {
         this.footWeight=mainData.getFootWeight();
         this.roadCurvature=mainData.getRoadCurvature();
         this.leftLineDistance=mainData.getLeftLineDistance();
+        this.roadDepartures=mainData.getRoadDepartures();
         this.rightLineDistance=mainData.getRightLineDistance();
         this.distanceStartingTime=mainData.getDistanceStartingTime();
     }

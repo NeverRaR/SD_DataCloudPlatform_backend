@@ -15,10 +15,13 @@ import com.neverrar.datacloudplatform.backend.request.CreateTaskRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateTaskRequest;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.AllTaskByProject;
+import com.neverrar.datacloudplatform.backend.view.AllTestByTask;
 import com.neverrar.datacloudplatform.backend.view.TaskInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -65,6 +68,7 @@ public class TaskService {
         return Result.wrapSuccessfulResult(new TaskInformation(optionalTask.get()));
     }
 
+    @Transactional
     public Result<TaskInformation> updateTask (UpdateTaskRequest body, Integer id, User user) {
         Optional<Task> optionalTask=taskRepository.findById(id);
         if(!optionalTask.isPresent()) {
@@ -81,7 +85,7 @@ public class TaskService {
         return Result.wrapSuccessfulResult(new TaskInformation(task));
     }
 
-
+    @Transactional
     public Result<String> deleteTask(User user,Integer id) {
         Optional<Task> optionalTask=taskRepository.findById(id);
         if(!optionalTask.isPresent()) {
@@ -92,5 +96,19 @@ public class TaskService {
         }
         taskRepository.delete(optionalTask.get());
         return Result.wrapSuccessfulResult("Deleted");
+    }
+
+    public Result<AllTestByTask> getOwnedTest (User user, Integer id) {
+        Optional<Task> optionalTask= taskRepository.findById(id);
+        if(!optionalTask.isPresent()) {
+            return Result.wrapErrorResult(new TaskNotExistedError());
+        }
+        if(!user.getId().equals(optionalTask.get().getOwner().getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        AllTestByTask result=new AllTestByTask(optionalTask.get().testSetInstance());
+        result.setTaskId(optionalTask.get().getId());
+        return Result.wrapSuccessfulResult(result);
+
     }
 }

@@ -13,6 +13,8 @@ import com.neverrar.datacloudplatform.backend.service.AuthenticationService;
 import com.neverrar.datacloudplatform.backend.service.TaskService;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
+import com.neverrar.datacloudplatform.backend.view.AllTestByTask;
+import com.neverrar.datacloudplatform.backend.view.AllTesterByProject;
 import com.neverrar.datacloudplatform.backend.view.TaskInformation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -56,6 +58,16 @@ public class TaskController {
         return taskService.getTask(user,id);
     }
 
+
+    @GetMapping("{id}/tests")
+    public @ResponseBody Result<AllTestByTask> getOwnedTester (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return  taskService.getOwnedTest(user,id);
+    }
 
     @PutMapping("/{id}")
     public @ResponseBody Result<TaskInformation> updateTask (@CookieValue(value = "sessionId",

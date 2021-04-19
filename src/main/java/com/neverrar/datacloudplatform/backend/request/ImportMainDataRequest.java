@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class ImportMainDataRequest {
     private Integer testId;
-    private List<MainDataRequest> list;
+    private List<MainDataRequest> dataList;
 }

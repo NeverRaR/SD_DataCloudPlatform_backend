@@ -42,13 +42,13 @@ public class MainDataService {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
 
-        for(MainDataRequest dataRequest : body.getList()){
+        for(MainDataRequest dataRequest : body.getDataList()){
             MainData mainData=wrapMainData(dataRequest);
             mainData.setTest(optionalTest.get());
             mainDataRepository.save(mainData);
         }
         ImportDataResult result=new ImportDataResult();
-        result.setDataCount(body.getList().size());
+        result.setDataCount(body.getDataList().size());
         result.setTestId(body.getTestId());
         result.setImportTime(new Date());
         return Result.wrapSuccessfulResult(result);
@@ -79,12 +79,13 @@ public class MainDataService {
         mainData.setAccelerate(dataRequest.getAccelerate());
         mainData.setAngleSpeed(dataRequest.getAngleSpeed());
         mainData.setDataTime(dataRequest.getDataTime());
+        mainData.setTurnAround(dataRequest.getTurnAround());
+        mainData.setRoadDepartures(dataRequest.getRoadDepartures());
         mainData.setDistanceStartingTime(dataRequest.getDistanceStartingTime());
         mainData.setFootWeight(dataRequest.getFootWeight());
         mainData.setLeftLineDistance(dataRequest.getLeftLineDistance());
         mainData.setRightLineDistance(dataRequest.getRightLineDistance());
         mainData.setRoadCurvature(dataRequest.getRoadCurvature());
-        mainData.setRoadDepartures(dataRequest.getRoadDepartures());
         mainData.setSpeed(dataRequest.getSpeed());
         mainData.setSteerTurn(dataRequest.getSteerTurn());
         return mainData;
