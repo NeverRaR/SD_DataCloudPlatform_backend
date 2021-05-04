@@ -4,14 +4,15 @@ import com.neverrar.datacloudplatform.backend.model.MainData;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class MainDataInformation {
+public class MainDataInformation implements Serializable {
 
-    private Integer id;
+    private String date;
 
-    private Date dataTime;
+    private String time;
 
     private Double speed;
 
@@ -19,35 +20,10 @@ public class MainDataInformation {
 
     private Double turnAround;
 
-    private Double steerTurn;
-
-    private Double angleSpeed;
-
-    private Double footWeight;
-
-    private Double roadDepartures;
-
-    private Double roadCurvature;
-
     private Double leftLineDistance;
 
     private Double rightLineDistance;
 
     private Double distanceStartingTime;
 
-    public MainDataInformation(MainData mainData){
-        this.id=mainData.getId();
-        this.dataTime=mainData.getDataTime();
-        this.speed=mainData.getSpeed();
-        this.accelerate=mainData.getAccelerate();
-        this.turnAround=mainData.getTurnAround();
-        this.steerTurn=mainData.getSteerTurn();
-        this.angleSpeed=mainData.getAngleSpeed();
-        this.footWeight=mainData.getFootWeight();
-        this.roadCurvature=mainData.getRoadCurvature();
-        this.leftLineDistance=mainData.getLeftLineDistance();
-        this.roadDepartures=mainData.getRoadDepartures();
-        this.rightLineDistance=mainData.getRightLineDistance();
-        this.distanceStartingTime=mainData.getDistanceStartingTime();
-    }
 }

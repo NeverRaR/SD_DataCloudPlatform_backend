@@ -1,5 +1,7 @@
 package com.neverrar.datacloudplatform.backend.model;
 
+import sun.applet.Main;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -10,7 +12,7 @@ public class Test {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name="test_time")
     private Date testTime;
 
@@ -26,8 +28,8 @@ public class Test {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    private Set<MainData> mainDataSet;
+    @OneToOne(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private MainData mainData;
 
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<LogEventData> logEventDataSet;
@@ -91,14 +93,6 @@ public class Test {
         this.task = task;
     }
 
-    public Set<MainData> getMainDataSet() {
-        return mainDataSet;
-    }
-
-    public void setMainDataSet(Set<MainData> mainDataSet) {
-        this.mainDataSet = mainDataSet;
-    }
-
     public Set<LogEventData> getLogEventDataSet() {
         return logEventDataSet;
     }
@@ -121,5 +115,13 @@ public class Test {
 
     public void setMarkDataSet(Set<MarkData> markDataSet) {
         this.markDataSet = markDataSet;
+    }
+
+    public MainData getMainData() {
+        return mainData;
+    }
+
+    public void setMainData(MainData mainData) {
+        this.mainData = mainData;
     }
 }

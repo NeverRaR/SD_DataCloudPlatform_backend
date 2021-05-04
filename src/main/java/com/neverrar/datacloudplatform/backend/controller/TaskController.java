@@ -60,13 +60,13 @@ public class TaskController {
 
 
     @GetMapping("{id}/tests")
-    public @ResponseBody Result<AllTestByTask> getOwnedTester (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
+    public @ResponseBody Result<AllTestByTask> getOwnedTest (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @PathVariable Integer id,@RequestParam Integer testerId) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return  taskService.getOwnedTest(user,id);
+        return  taskService.getOwnedTest(user,id,testerId);
     }
 
     @PutMapping("/{id}")

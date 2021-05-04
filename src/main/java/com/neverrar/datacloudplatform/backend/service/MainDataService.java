@@ -1,5 +1,6 @@
 package com.neverrar.datacloudplatform.backend.service;
 
+import com.alibaba.fastjson.JSON;
 import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
 import com.neverrar.datacloudplatform.backend.error.TestNotExistedError;
 import com.neverrar.datacloudplatform.backend.error.TesterNotExistedError;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,60 +37,33 @@ public class MainDataService {
 
     public @Transactional
     Result<ImportDataResult> importMainData (ImportMainDataRequest body, User user) {
-        Optional<Test> optionalTest=testRepository.findById(body.getTestId());
-        if(!optionalTest.isPresent()) {
-            return Result.wrapErrorResult(new TesterNotExistedError());
-        }
-        if(!optionalTest.get().getOwner().getId().equals(user.getId())){
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        }
-
-        for(MainDataRequest dataRequest : body.getDataList()){
-            MainData mainData=wrapMainData(dataRequest);
-            mainData.setTest(optionalTest.get());
-            mainDataRepository.save(mainData);
-        }
-        ImportDataResult result=new ImportDataResult();
-        result.setDataCount(body.getDataList().size());
-        result.setTestId(body.getTestId());
-        result.setImportTime(new Date());
-        return Result.wrapSuccessfulResult(result);
+       return null;
     }
 
     public Result<AllMainDataByTest> getAllMainDataByTest(Integer testId,User user){
-        Optional<Test> optionalTest=testRepository.findById(testId);
-        if(!optionalTest.isPresent()) {
-            return Result.wrapErrorResult(new TesterNotExistedError());
+        try {
+            Optional<Test> optionalTest = testRepository.findById(testId);
+            if (!optionalTest.isPresent()) {
+                return Result.wrapErrorResult(new TesterNotExistedError());
+            }
+            if (!optionalTest.get().getOwner().getId().equals(user.getId())) {
+                return Result.wrapErrorResult(new PermissionDeniedError());
+            }
+            File file=new File(optionalTest.get().getMainData().getPath());
+            byte[] bytes = new byte[1024];
+            StringBuilder sb = new StringBuilder();
+            FileInputStream in = new FileInputStream(file);
+            int len;
+            while ((len = in.read(bytes)) != -1) {
+                sb.append(new String(bytes, 0, len));
+            }
+
+            AllMainDataByTest allMainDataByTest = JSON.parseObject(sb.toString(),AllMainDataByTest.class);
+            return Result.wrapSuccessfulResult(allMainDataByTest);
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        if(!optionalTest.get().getOwner().getId().equals(user.getId())){
-            return Result.wrapErrorResult(new PermissionDeniedError());
-        }
-        AllMainDataByTest allMainDataByTest=new AllMainDataByTest();
-        List<MainDataInformation> list=new LinkedList<>();
-        for(MainData mainData: optionalTest.get().getMainDataSet()){
-            MainDataInformation mainDataInformation=new MainDataInformation(mainData);
-            list.add(mainDataInformation);
-        }
-        allMainDataByTest.setTestId(testId);
-        allMainDataByTest.setList(list);
-        return Result.wrapSuccessfulResult(allMainDataByTest);
+        return null;
     }
 
-
-    private MainData wrapMainData(MainDataRequest dataRequest){
-        MainData mainData=new MainData();
-        mainData.setAccelerate(dataRequest.getAccelerate());
-        mainData.setAngleSpeed(dataRequest.getAngleSpeed());
-        mainData.setDataTime(dataRequest.getDataTime());
-        mainData.setTurnAround(dataRequest.getTurnAround());
-        mainData.setRoadDepartures(dataRequest.getRoadDepartures());
-        mainData.setDistanceStartingTime(dataRequest.getDistanceStartingTime());
-        mainData.setFootWeight(dataRequest.getFootWeight());
-        mainData.setLeftLineDistance(dataRequest.getLeftLineDistance());
-        mainData.setRightLineDistance(dataRequest.getRightLineDistance());
-        mainData.setRoadCurvature(dataRequest.getRoadCurvature());
-        mainData.setSpeed(dataRequest.getSpeed());
-        mainData.setSteerTurn(dataRequest.getSteerTurn());
-        return mainData;
-    }
 }

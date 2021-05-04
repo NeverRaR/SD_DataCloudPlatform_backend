@@ -9,6 +9,7 @@ import com.neverrar.datacloudplatform.backend.request.CreateProjectRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateProjectRequest;
 import com.neverrar.datacloudplatform.backend.service.AuthenticationService;
 import com.neverrar.datacloudplatform.backend.service.ProjectService;
+import com.neverrar.datacloudplatform.backend.util.DataParser;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
@@ -20,6 +21,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
@@ -34,17 +36,16 @@ public class ProjectController {
     @Autowired
     private AuthenticationService authenticationService;
 
-
-
     @PostMapping // Map ONLY POST Requests
     public @ResponseBody
     Result<ProjectInformation> addNewProject (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId,@RequestBody CreateProjectRequest body) {
+            defaultValue = "noSession") String sessionId, @RequestBody MultipartFile file) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return projectService.addNewProject(body,user);
+
+        return projectService.addNewProject(file,user);
     }
 
     @GetMapping

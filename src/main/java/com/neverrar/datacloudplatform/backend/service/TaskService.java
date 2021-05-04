@@ -4,12 +4,10 @@ import com.neverrar.datacloudplatform.backend.error.InvalidSessionIdError;
 import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
 import com.neverrar.datacloudplatform.backend.error.ProjectNotExistedError;
 import com.neverrar.datacloudplatform.backend.error.TaskNotExistedError;
-import com.neverrar.datacloudplatform.backend.model.Project;
-import com.neverrar.datacloudplatform.backend.model.Task;
-import com.neverrar.datacloudplatform.backend.model.Test;
-import com.neverrar.datacloudplatform.backend.model.User;
+import com.neverrar.datacloudplatform.backend.model.*;
 import com.neverrar.datacloudplatform.backend.repository.ProjectRepository;
 import com.neverrar.datacloudplatform.backend.repository.TaskRepository;
+import com.neverrar.datacloudplatform.backend.repository.TestRepository;
 import com.neverrar.datacloudplatform.backend.repository.UserRepository;
 import com.neverrar.datacloudplatform.backend.request.CreateTaskRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateTaskRequest;
@@ -38,6 +36,9 @@ public class TaskService {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TestRepository testRepository;
 
     public Result<TaskInformation> addNewTask (CreateTaskRequest body, User user) {
         Optional<Project> optionalProject=projectRepository.findById(body.getProjectId());
@@ -98,7 +99,7 @@ public class TaskService {
         return Result.wrapSuccessfulResult("Deleted");
     }
 
-    public Result<AllTestByTask> getOwnedTest (User user, Integer id) {
+    public Result<AllTestByTask> getOwnedTest (User user, Integer id,Integer testerId) {
         Optional<Task> optionalTask= taskRepository.findById(id);
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
@@ -106,7 +107,9 @@ public class TaskService {
         if(!user.getId().equals(optionalTask.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
-        AllTestByTask result=new AllTestByTask(optionalTask.get().testSetInstance());
+        Tester tester=new Tester();
+        tester.setId(testerId);
+        AllTestByTask result=new AllTestByTask(testRepository.findAllByTesterAndTask(tester,optionalTask.get()));
         result.setTaskId(optionalTask.get().getId());
         return Result.wrapSuccessfulResult(result);
 

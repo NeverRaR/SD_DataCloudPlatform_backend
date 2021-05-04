@@ -1,5 +1,6 @@
 package com.neverrar.datacloudplatform.backend.service;
 
+import com.neverrar.datacloudplatform.backend.config.DataPathConfig;
 import com.neverrar.datacloudplatform.backend.error.InvalidSessionIdError;
 import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
 import com.neverrar.datacloudplatform.backend.error.ProjectNotExistedError;
@@ -11,6 +12,7 @@ import com.neverrar.datacloudplatform.backend.model.User;
 import com.neverrar.datacloudplatform.backend.repository.*;
 import com.neverrar.datacloudplatform.backend.request.CreateProjectRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateProjectRequest;
+import com.neverrar.datacloudplatform.backend.util.DataParser;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
@@ -22,6 +24,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
@@ -33,18 +36,49 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @Transactional
-    public  Result<ProjectInformation> addNewProject (CreateProjectRequest request, User user) {
+    @Autowired
+    private TesterRepository testerRepository;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TestRepository testRepository;
+
+    @Autowired
+    private MainDataRepository mainDataRepository;
+
+    @Autowired
+    private DataPathConfig dataPathConfig;
+
+    @Transactional
+    public  Result<ProjectInformation> addNewProject (MultipartFile data, User user) {
+
+        DataParser dataParser=new DataParser();
+        dataParser.setPath(dataPathConfig.getBasePath());
+        dataParser.setProjectRepository(projectRepository);
+        dataParser.setTaskRepository(taskRepository);
+        dataParser.setTesterRepository(testerRepository);
+        dataParser.setTestRepository(testRepository);
+        dataParser.setMainDataRepository(mainDataRepository);
+
+
+        dataParser.setOwner(user);
+        dataParser.parseZip(data);
+        dataParser.upload();
+        dataParser.clear();
+        return Result.wrapSuccessfulResult(new ProjectInformation(dataParser.getProject()));
+        /*
         Project project=new Project();
         Date date=new Date();
         project.setCreateTime(date);
         project.setLastModified(date);
-        project.setName(request.getName());
+        project.setName(data.getName());
         project.setDescription(request.getDescription());
         project.setOwner(user);
         projectRepository.save(project);
         return Result.wrapSuccessfulResult(new ProjectInformation(project));
+         */
     }
 
     public Result<ProjectInformation> getProject (User user, Integer id) {
@@ -129,6 +163,7 @@ public class ProjectService {
         if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
+
         projectRepository.delete(optionalProject.get());
         return Result.wrapSuccessfulResult("Deleted");
     }
