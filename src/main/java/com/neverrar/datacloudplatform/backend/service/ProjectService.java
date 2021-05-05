@@ -51,6 +51,9 @@ public class ProjectService {
     @Autowired
     private DataPathConfig dataPathConfig;
 
+    @Autowired
+    private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
+
     @Transactional
     public  Result<ProjectInformation> addNewProject (MultipartFile data, User user) {
 
@@ -61,13 +64,14 @@ public class ProjectService {
         dataParser.setTesterRepository(testerRepository);
         dataParser.setTestRepository(testRepository);
         dataParser.setMainDataRepository(mainDataRepository);
-
+        dataParser.setInteractionBehaviourDataRepository(interactionBehaviourDataRepository);
 
         dataParser.setOwner(user);
         dataParser.parseZip(data);
         dataParser.upload();
         dataParser.clear();
         return Result.wrapSuccessfulResult(new ProjectInformation(dataParser.getProject()));
+
         /*
         Project project=new Project();
         Date date=new Date();

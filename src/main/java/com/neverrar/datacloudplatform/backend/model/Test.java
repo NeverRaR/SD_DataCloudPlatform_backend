@@ -34,8 +34,8 @@ public class Test {
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<LogEventData> logEventDataSet;
 
-    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    private Set<InteractionBehaviourData> interactionBehaviourDataSet;
+    @OneToOne(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private InteractionBehaviourData interactionBehaviourData;
 
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<MarkData> markDataSet;
@@ -101,14 +101,6 @@ public class Test {
         this.logEventDataSet = logEventDataSet;
     }
 
-    public Set<InteractionBehaviourData> getInteractionBehaviourDataSet() {
-        return interactionBehaviourDataSet;
-    }
-
-    public void setInteractionBehaviourDataSet(Set<InteractionBehaviourData> interactionBehaviourDataSet) {
-        this.interactionBehaviourDataSet = interactionBehaviourDataSet;
-    }
-
     public Set<MarkData> getMarkDataSet() {
         return markDataSet;
     }
@@ -123,5 +115,13 @@ public class Test {
 
     public void setMainData(MainData mainData) {
         this.mainData = mainData;
+    }
+
+    public InteractionBehaviourData getInteractionBehaviourData() {
+        return interactionBehaviourData;
+    }
+
+    public void setInteractionBehaviourData(InteractionBehaviourData interactionBehaviourData) {
+        this.interactionBehaviourData = interactionBehaviourData;
     }
 }

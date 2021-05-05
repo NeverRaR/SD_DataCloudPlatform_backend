@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.csvreader.CsvReader;
 import com.neverrar.datacloudplatform.backend.model.*;
 import com.neverrar.datacloudplatform.backend.repository.*;
+import com.neverrar.datacloudplatform.backend.view.AllInteractionBehaviourDataByTest;
 import com.neverrar.datacloudplatform.backend.view.AllMainDataByTest;
+import com.neverrar.datacloudplatform.backend.view.InteractionBehaviourDataInformation;
 import com.neverrar.datacloudplatform.backend.view.MainDataInformation;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
@@ -46,6 +48,8 @@ public class DataParser {
    private TestRepository testRepository;
 
    private MainDataRepository mainDataRepository;
+
+   private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
 
    public  void parseZip(MultipartFile dataFile){
        try {
@@ -131,7 +135,9 @@ public class DataParser {
 
    private void uploadTestData(Test test,File file){
        File[] dataList = file.listFiles();
-       if(dataList==null) return;
+       if(dataList==null) {
+           return;
+       }
        for(File dataFile: dataList){
            switch (dataFile.getName()) {
                case "main.csv":
@@ -140,11 +146,71 @@ public class DataParser {
                case "LogEvent.csv":
                    uploadLogEventData(test,dataFile);
                    break;
+               case "InteractionBehaviour.csv":
+                   uploadInteractionBehaviourData(test,dataFile);
+                   break;
+               case "Mark.csv":
+                   uploadMarkData(test,dataFile);
+                   break;
                default:
                    break;
            }
        }
    }
+
+    private void uploadMarkData(Test test,File file){
+
+    }
+
+    private void uploadInteractionBehaviourData(Test test,File file){
+        FileWriter fWriter = null;
+        try {
+            CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
+            csvReader.readHeaders();
+            AllInteractionBehaviourDataByTest allInteractionBehaviourDataByTest=new AllInteractionBehaviourDataByTest();
+            allInteractionBehaviourDataByTest.setTestId(test.getId());
+            List<InteractionBehaviourDataInformation> list=new LinkedList<>();
+            InteractionBehaviourData interactionBehaviourData=new InteractionBehaviourData();
+            interactionBehaviourData.setTest(test);
+            while(csvReader.readRecord()){
+                InteractionBehaviourDataInformation info=new InteractionBehaviourDataInformation();
+                list.add(info);
+                info.setType(csvReader.get("Type"));
+                info.setLocation(csvReader.get("Location"));
+                info.setElement(csvReader.get("Element"));
+                info.setStartTime(csvReader.get("StartTime"));
+                info.setEndTime(csvReader.get("EndTime"));
+                info.setStartStatus(csvReader.get("StartStatus"));
+                info.setEndStatus(csvReader.get("EndStatus"));
+
+                info.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+            }
+            allInteractionBehaviourDataByTest.setList(list);
+            File jsonFile=new File(file.getAbsolutePath()+".json");
+            fWriter = new FileWriter(jsonFile);
+            fWriter.write(JSON.toJSONString(allInteractionBehaviourDataByTest));
+            interactionBehaviourData.setPath(jsonFile.getAbsolutePath());
+            interactionBehaviourDataRepository.save(interactionBehaviourData);
+            csvReader.close();
+            deleteDir(file);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fWriter!= null) {
+                    fWriter.flush();
+                    fWriter.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static Double doubleValue(String s) throws NumberFormatException {
+       if(s.isEmpty()) return 0.0;
+       return Double.valueOf(s);
+    }
 
     private void uploadLogEventData(Test test,File file){
 
@@ -162,23 +228,23 @@ public class DataParser {
            mainData.setTest(test);
            while(csvReader.readRecord()){
                MainDataInformation mainDataInfo=new MainDataInformation();
+               mainList.add(mainDataInfo);
                mainDataInfo.setDate(csvReader.get("Date"));
                mainDataInfo.setTime(csvReader.get("Time"));
-               mainDataInfo.setSpeed(Double.valueOf(csvReader.get("Speed")));
-               mainDataInfo.setAccelerate(Double.valueOf(csvReader.get("Accelerate")));
-               mainDataInfo.setTurnAround(Double.valueOf(csvReader.get("TurnAround")));
-               mainDataInfo.setLeftLineDistance(Double.valueOf(csvReader.get("LeftLineDistance")));
-               mainDataInfo.setRightLineDistance(Double.valueOf(csvReader.get("RightLineDistance")));
-               mainDataInfo.setDistanceStartingTime(Double.valueOf(csvReader.get("DistanceStartingTime")));
-               mainList.add(mainDataInfo);
+               mainDataInfo.setSpeed(doubleValue(csvReader.get("Speed")));
+               mainDataInfo.setAccelerate(doubleValue(csvReader.get("Accelerate")));
+               mainDataInfo.setTurnAround(doubleValue(csvReader.get("TurnAround")));
+               mainDataInfo.setLeftLineDistance(doubleValue(csvReader.get("LeftLineDistance")));
+               mainDataInfo.setRightLineDistance(doubleValue(csvReader.get("RightLineDistance")));
+               mainDataInfo.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
            }
-           csvReader.close();
            allMainDataByTest.setList(mainList);
            File jsonFile=new File(file.getAbsolutePath()+".json");
            fWriter = new FileWriter(jsonFile);
            fWriter.write(JSON.toJSONString(allMainDataByTest));
            mainData.setPath(jsonFile.getAbsolutePath());
            mainDataRepository.save(mainData);
+           csvReader.close();
            deleteDir(file);
        } catch (Exception e){
            e.printStackTrace();
@@ -300,5 +366,9 @@ public class DataParser {
 
     public void setMainDataRepository(MainDataRepository mainDataRepository) {
         this.mainDataRepository = mainDataRepository;
+    }
+
+    public void setInteractionBehaviourDataRepository(InteractionBehaviourDataRepository interactionBehaviourDataRepository) {
+        this.interactionBehaviourDataRepository = interactionBehaviourDataRepository;
     }
 }
