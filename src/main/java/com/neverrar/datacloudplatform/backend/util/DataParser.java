@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.csvreader.CsvReader;
 import com.neverrar.datacloudplatform.backend.model.*;
 import com.neverrar.datacloudplatform.backend.repository.*;
+import com.neverrar.datacloudplatform.backend.service.OSSService;
 import com.neverrar.datacloudplatform.backend.view.AllInteractionBehaviourDataByTest;
 import com.neverrar.datacloudplatform.backend.view.AllMainDataByTest;
 import com.neverrar.datacloudplatform.backend.view.InteractionBehaviourDataInformation;
@@ -28,6 +29,8 @@ public class DataParser {
 
    private final HashMap<String,Task> taskHashMap=new HashMap<>();
 
+   private final HashMap<String,Test> testHashMap=new HashMap<>();
+
    private final Project project=new Project();
 
    private User owner;
@@ -39,6 +42,8 @@ public class DataParser {
    private File dFile;
 
    private File dataFolder;
+
+   private File screenCaptureFolder;
 
    private ProjectRepository projectRepository;
 
@@ -52,6 +57,11 @@ public class DataParser {
 
    private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
 
+   private VideoRepository videoRepository;
+
+   private OSSService ossService;
+
+
    public  void parseZip(MultipartFile dataFile){
        try {
            zFile = new File(path+"zip/" +dataFile.getName()+UUID.randomUUID() + ".zip");
@@ -63,6 +73,7 @@ public class DataParser {
            dFile.mkdirs();
            zipFile.extractAll(dFile.getPath());
            parseProject(dFile);
+           project.setName(dataFile.getOriginalFilename());
            parseTotalFile(dFile);
        }
        catch (IOException | ZipException e){
@@ -79,6 +90,8 @@ public class DataParser {
                    parseTester(dataFile);
                    dataFolder=dataFile;
                    break;
+               case "ScreenCaptureFolder":
+                   screenCaptureFolder=dataFile;
                default:
                    break;
            }
@@ -98,6 +111,7 @@ public class DataParser {
         uploadTask();
         uploadTester();
         uploadTest();
+        uploadVideo();
    }
 
    private void uploadProject(){
@@ -118,9 +132,11 @@ public class DataParser {
        for(File testerFile : testerList){
            Tester tester=testerHashMap.get(testerFile.getName());
            File[] taskList = testerFile.listFiles();
+           if(taskList==null) continue;
            for(File taskFile : taskList){
                Task task=taskHashMap.get(taskFile.getName());
                File[] testList = taskFile.listFiles();
+               if(testList==null) continue;
                for(File testFile : testList){
                    Test test=new Test();
                    test.setOwner(owner);
@@ -129,7 +145,36 @@ public class DataParser {
                    test.setTestTime(new Date());
                    test.setName((testFile.getName()));
                    testRepository.save(test);
+                   testHashMap.put(tester.getId()+"/"+task.getId()+"/"+test.getName(),test);
                    uploadTestData(test,testFile);
+               }
+           }
+       }
+   }
+
+   private void uploadVideo(){
+       File[] testerList = screenCaptureFolder.listFiles();
+       if(testerList==null) return;
+       for(File testerFile : testerList){
+           Tester tester=testerHashMap.get(testerFile.getName());
+           File[] taskList = testerFile.listFiles();
+           if(taskList==null) continue;
+           for(File taskFile : taskList){
+               Task task=taskHashMap.get(taskFile.getName());
+               File[] testList = taskFile.listFiles();
+               if(testList==null) continue;
+               for(File testFile : testList){
+                   Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testFile.getName());
+                   File[] videoList = testFile.listFiles();
+                   if(videoList==null) continue;
+                   for(File videoFile : videoList){
+                        String url=ossService.uploadFile(videoFile);
+                        Video video=new Video();
+                        video.setTest(test);
+                        video.setName(videoFile.getName());
+                        video.setUrl(url);
+                        videoRepository.save(video);
+                   }
                }
            }
        }
@@ -350,5 +395,13 @@ public class DataParser {
 
     public void setInteractionBehaviourDataRepository(InteractionBehaviourDataRepository interactionBehaviourDataRepository) {
         this.interactionBehaviourDataRepository = interactionBehaviourDataRepository;
+    }
+
+    public void setVideoRepository(VideoRepository videoRepository) {
+        this.videoRepository = videoRepository;
+    }
+
+    public void setOssService(OSSService ossService) {
+        this.ossService = ossService;
     }
 }

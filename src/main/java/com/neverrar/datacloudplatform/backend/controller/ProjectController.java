@@ -86,6 +86,16 @@ public class ProjectController {
         return  projectService.getOwnedTester(user,id);
     }
 
+    @GetMapping("/latest")
+    public @ResponseBody Result<AllMainDataByTest> getLatestMain (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return  projectService.getLatestMain(user);
+    }
+
     @GetMapping("/{id}")
     public @ResponseBody Result<ProjectInformation> getProject (@CookieValue(value = "sessionId",
             defaultValue = "noSession") String sessionId, @PathVariable Integer id) {

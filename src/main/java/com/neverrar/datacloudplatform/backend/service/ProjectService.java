@@ -47,6 +47,12 @@ public class ProjectService {
     @Autowired
     private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
 
+    @Autowired
+    private VideoRepository videoRepository;
+
+    @Autowired
+    private OSSService ossService;
+
     @Transactional
     public  Result<ProjectInformation> addNewProject (MultipartFile data, User user) {
 
@@ -58,6 +64,8 @@ public class ProjectService {
         dataParser.setTestRepository(testRepository);
         dataParser.setMainDataRepository(mainDataRepository);
         dataParser.setInteractionBehaviourDataRepository(interactionBehaviourDataRepository);
+        dataParser.setOssService(ossService);
+        dataParser.setVideoRepository(videoRepository);
 
         dataParser.setOwner(user);
         dataParser.parseZip(data);
@@ -92,6 +100,24 @@ public class ProjectService {
         return Result.wrapSuccessfulResult(new ProjectInformation(optionalProject.get()));
     }
 
+
+    public Result<AllMainDataByTest> getLatestMain(User user){
+        Set<Project> projectSet=user.projectSetInstance();
+        if(projectSet==null&&projectSet.isEmpty()) {
+            return null;
+        }
+        Project latestProject=projectSet.iterator().next();
+        Integer maxId=latestProject.getId();
+        for(Project project : projectSet){
+            if(project.getId()>maxId) {
+                latestProject=project;
+            }
+        }
+        Test test=latestProject.taskSetInstance().iterator().next().testSetInstance().iterator().next();
+        AllMainDataByTest allMainDataByTest = new AllMainDataByTest(test.getMainDataSet());
+        allMainDataByTest.setTestId(test.getId());
+        return Result.wrapSuccessfulResult(allMainDataByTest);
+    }
 
     public Result<AllProjectInfoByUser> getOwnedProject (User user) {
         if (user == null) {
