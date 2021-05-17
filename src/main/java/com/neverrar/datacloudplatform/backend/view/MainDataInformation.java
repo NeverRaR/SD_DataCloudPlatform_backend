@@ -10,9 +10,9 @@ import java.util.Date;
 @Data
 public class MainDataInformation implements Serializable {
 
-    private String date;
+    private Date date;
 
-    private String time;
+    private Date time;
 
     private Double speed;
 
@@ -26,4 +26,15 @@ public class MainDataInformation implements Serializable {
 
     private Double distanceStartingTime;
 
+
+    public MainDataInformation(MainData mainData){
+        this.date=mainData.getDate();
+        this.time=mainData.getTime();
+        this.speed=mainData.getSpeed();
+        this.accelerate=mainData.getAccelerate();
+        this.turnAround=mainData.getTurnAround();
+        this.leftLineDistance=mainData.getLeftLineDistance();
+        this.rightLineDistance=mainData.getRightLineDistance();
+        this.distanceStartingTime=mainData.getDistanceStartingTime();
+    }
 }

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -126,6 +127,7 @@ public class DataParser {
                    test.setTester(tester);
                    test.setTask(task);
                    test.setTestTime(new Date());
+                   test.setName((testFile.getName()));
                    testRepository.save(test);
                    uploadTestData(test,testFile);
                }
@@ -163,47 +165,28 @@ public class DataParser {
     }
 
     private void uploadInteractionBehaviourData(Test test,File file){
-        FileWriter fWriter = null;
         try {
             CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
             csvReader.readHeaders();
-            AllInteractionBehaviourDataByTest allInteractionBehaviourDataByTest=new AllInteractionBehaviourDataByTest();
-            allInteractionBehaviourDataByTest.setTestId(test.getId());
-            List<InteractionBehaviourDataInformation> list=new LinkedList<>();
-            InteractionBehaviourData interactionBehaviourData=new InteractionBehaviourData();
-            interactionBehaviourData.setTest(test);
+            List<InteractionBehaviourData> list=new LinkedList<>();
             while(csvReader.readRecord()){
-                InteractionBehaviourDataInformation info=new InteractionBehaviourDataInformation();
-                list.add(info);
-                info.setType(csvReader.get("Type"));
-                info.setLocation(csvReader.get("Location"));
-                info.setElement(csvReader.get("Element"));
-                info.setStartTime(csvReader.get("StartTime"));
-                info.setEndTime(csvReader.get("EndTime"));
-                info.setStartStatus(csvReader.get("StartStatus"));
-                info.setEndStatus(csvReader.get("EndStatus"));
-
-                info.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+                InteractionBehaviourData data=new InteractionBehaviourData();
+                data.setTest(test);
+                data.setType(csvReader.get("Type"));
+                data.setLocation(csvReader.get("Location"));
+                data.setElement(csvReader.get("Element"));
+                data.setStartTime(dateValue(csvReader.get("StartTime"),"yyyy-MM-dd HH:mm:ss.SSS"));
+                data.setEndTime(dateValue(csvReader.get("EndTime"),"yyyy-MM-dd HH:mm:ss.SSS"));
+                data.setStartStatus(csvReader.get("StartStatus"));
+                data.setEndStatus(csvReader.get("EndStatus"));
+                data.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+                data.setTest(test);
+                list.add(data);
             }
-            allInteractionBehaviourDataByTest.setList(list);
-            File jsonFile=new File(file.getAbsolutePath()+".json");
-            fWriter = new FileWriter(jsonFile);
-            fWriter.write(JSON.toJSONString(allInteractionBehaviourDataByTest));
-            interactionBehaviourData.setPath(jsonFile.getAbsolutePath());
-            interactionBehaviourDataRepository.save(interactionBehaviourData);
+            interactionBehaviourDataRepository.saveAll(list);
             csvReader.close();
-            deleteDir(file);
         } catch (Exception e){
             e.printStackTrace();
-        } finally {
-            try {
-                if(fWriter!= null) {
-                    fWriter.flush();
-                    fWriter.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
     }
 
@@ -211,57 +194,54 @@ public class DataParser {
        if(s.isEmpty()) return 0.0;
        return Double.valueOf(s);
     }
+    /*
+    * "yyyy-MM-dd"
+    * "HH:mm:ss.SSS"
+    * "yyyy-MM-dd HH:mm:ss.SSS"
+    */
+
+    private static Date dateValue(String s,String pattern){
+       try{
+           DateFormat dateFormat= new SimpleDateFormat(pattern);
+           return dateFormat.parse(s);
+       } catch (Exception e){
+           e.printStackTrace();
+           return null;
+       }
+    }
 
     private void uploadLogEventData(Test test,File file){
 
     }
 
    private void uploadMainData(Test test,File file){
-       FileWriter fWriter = null;
        try {
            CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
            csvReader.readHeaders();
-           AllMainDataByTest allMainDataByTest=new AllMainDataByTest();
-           allMainDataByTest.setTestId(test.getId());
-           List<MainDataInformation> mainList=new LinkedList<>();
-           MainData mainData=new MainData();
-           mainData.setTest(test);
+           List<MainData> list=new LinkedList<>();
            while(csvReader.readRecord()){
-               MainDataInformation mainDataInfo=new MainDataInformation();
-               mainList.add(mainDataInfo);
-               mainDataInfo.setDate(csvReader.get("Date"));
-               mainDataInfo.setTime(csvReader.get("Time"));
-               mainDataInfo.setSpeed(doubleValue(csvReader.get("Speed")));
-               mainDataInfo.setAccelerate(doubleValue(csvReader.get("Accelerate")));
-               mainDataInfo.setTurnAround(doubleValue(csvReader.get("TurnAround")));
-               mainDataInfo.setLeftLineDistance(doubleValue(csvReader.get("LeftLineDistance")));
-               mainDataInfo.setRightLineDistance(doubleValue(csvReader.get("RightLineDistance")));
-               mainDataInfo.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+               MainData data=new MainData();
+               data.setTest(test);
+               data.setDate(dateValue(csvReader.get("Date"),"yyyy-MM-dd"));
+               data.setTime(dateValue(csvReader.get("Time"),"HH:mm:ss.SSS"));
+               data.setSpeed(doubleValue(csvReader.get("Speed")));
+               data.setAccelerate(doubleValue(csvReader.get("Accelerate")));
+               data.setTurnAround(doubleValue(csvReader.get("TurnAround")));
+               data.setLeftLineDistance(doubleValue(csvReader.get("LeftLineDistance")));
+               data.setRightLineDistance(doubleValue(csvReader.get("RightLineDistance")));
+               data.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+               list.add(data);
            }
-           allMainDataByTest.setList(mainList);
-           File jsonFile=new File(file.getAbsolutePath()+".json");
-           fWriter = new FileWriter(jsonFile);
-           fWriter.write(JSON.toJSONString(allMainDataByTest));
-           mainData.setPath(jsonFile.getAbsolutePath());
-           mainDataRepository.save(mainData);
+           mainDataRepository.saveAll(list);
            csvReader.close();
-           deleteDir(file);
        } catch (Exception e){
            e.printStackTrace();
-       } finally {
-           try {
-               if(fWriter!= null) {
-                   fWriter.flush();
-                   fWriter.close();
-               }
-           } catch (IOException ex) {
-               ex.printStackTrace();
-           }
        }
    }
 
    public void clear(){
        deleteDir(zFile);
+       deleteDir(dFile);
    }
 
    private boolean deleteDir(File dir) {

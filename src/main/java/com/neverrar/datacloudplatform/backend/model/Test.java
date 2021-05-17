@@ -16,6 +16,9 @@ public class Test {
     @Column(name="test_time")
     private Date testTime;
 
+    @Column(name="test_name")
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="tester_id")
     private Tester tester;
@@ -28,14 +31,17 @@ public class Test {
     @JoinColumn(name="owner_id")
     private User owner;
 
-    @OneToOne(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    private MainData mainData;
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<MainData> mainDataSet;
+
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<Video> videoSet;
 
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<LogEventData> logEventDataSet;
 
-    @OneToOne(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    private InteractionBehaviourData interactionBehaviourData;
+    @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    private Set<InteractionBehaviourData> interactionBehaviourDataSet;
 
     @OneToMany(mappedBy = "test",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     private Set<MarkData> markDataSet;
@@ -47,7 +53,6 @@ public class Test {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public Date getTestTime() {
         return testTime;
@@ -109,19 +114,35 @@ public class Test {
         this.markDataSet = markDataSet;
     }
 
-    public MainData getMainData() {
-        return mainData;
+    public Set<MainData> getMainDataSet() {
+        return mainDataSet;
     }
 
-    public void setMainData(MainData mainData) {
-        this.mainData = mainData;
+    public void setMainDataSet(Set<MainData> mainDataSet) {
+        this.mainDataSet = mainDataSet;
     }
 
-    public InteractionBehaviourData getInteractionBehaviourData() {
-        return interactionBehaviourData;
+    public Set<InteractionBehaviourData> getInteractionBehaviourDataSet() {
+        return interactionBehaviourDataSet;
     }
 
-    public void setInteractionBehaviourData(InteractionBehaviourData interactionBehaviourData) {
-        this.interactionBehaviourData = interactionBehaviourData;
+    public void setInteractionBehaviourDataSet(Set<InteractionBehaviourData> interactionBehaviourDataSet) {
+        this.interactionBehaviourDataSet = interactionBehaviourDataSet;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Video> getVideoSet() {
+        return videoSet;
+    }
+
+    public void setVideoSet(Set<Video> videoSet) {
+        this.videoSet = videoSet;
     }
 }

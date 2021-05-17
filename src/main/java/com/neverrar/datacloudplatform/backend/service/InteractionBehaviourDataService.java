@@ -36,16 +36,9 @@ public class InteractionBehaviourDataService {
             if (!optionalTest.get().getOwner().getId().equals(user.getId())) {
                 return Result.wrapErrorResult(new PermissionDeniedError());
             }
-            File file=new File(optionalTest.get().getInteractionBehaviourData().getPath());
-            byte[] bytes = new byte[1024];
-            StringBuilder sb = new StringBuilder();
-            FileInputStream in = new FileInputStream(file);
-            int len;
-            while ((len = in.read(bytes)) != -1) {
-                sb.append(new String(bytes, 0, len));
-            }
             AllInteractionBehaviourDataByTest allInteractionBehaviourDataByTest =
-                    JSON.parseObject(sb.toString(),AllInteractionBehaviourDataByTest.class);
+                    new AllInteractionBehaviourDataByTest(optionalTest.get().getInteractionBehaviourDataSet());
+            allInteractionBehaviourDataByTest.setTestId(optionalTest.get().getId());
             return Result.wrapSuccessfulResult(allInteractionBehaviourDataByTest);
         } catch (Exception e){
             e.printStackTrace();

@@ -12,10 +12,7 @@ import com.neverrar.datacloudplatform.backend.service.ProjectService;
 import com.neverrar.datacloudplatform.backend.util.DataParser;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
-import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
-import com.neverrar.datacloudplatform.backend.view.AllTaskByProject;
-import com.neverrar.datacloudplatform.backend.view.AllTesterByProject;
-import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
+import com.neverrar.datacloudplatform.backend.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -66,6 +63,16 @@ public class ProjectController {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
         return  projectService.getOwnedTask(user,id);
+    }
+
+    @GetMapping("{id}/structure")
+    public @ResponseBody Result<ProjectWithTask> getProjectStructure (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @PathVariable Integer id) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return  projectService.getProjectStructure(user,id);
     }
 
 

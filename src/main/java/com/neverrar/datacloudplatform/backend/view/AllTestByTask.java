@@ -1,6 +1,5 @@
 package com.neverrar.datacloudplatform.backend.view;
 
-import com.neverrar.datacloudplatform.backend.model.Project;
 import com.neverrar.datacloudplatform.backend.model.Test;
 import lombok.Data;
 

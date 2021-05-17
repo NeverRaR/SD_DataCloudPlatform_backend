@@ -5,20 +5,14 @@ import com.neverrar.datacloudplatform.backend.error.InvalidSessionIdError;
 import com.neverrar.datacloudplatform.backend.error.PermissionDeniedError;
 import com.neverrar.datacloudplatform.backend.error.ProjectNotExistedError;
 import com.neverrar.datacloudplatform.backend.error.UserNotExistedError;
-import com.neverrar.datacloudplatform.backend.model.Project;
-import com.neverrar.datacloudplatform.backend.model.Task;
-import com.neverrar.datacloudplatform.backend.model.Test;
-import com.neverrar.datacloudplatform.backend.model.User;
+import com.neverrar.datacloudplatform.backend.model.*;
 import com.neverrar.datacloudplatform.backend.repository.*;
 import com.neverrar.datacloudplatform.backend.request.CreateProjectRequest;
 import com.neverrar.datacloudplatform.backend.request.UpdateProjectRequest;
 import com.neverrar.datacloudplatform.backend.util.DataParser;
 import com.neverrar.datacloudplatform.backend.util.Request;
 import com.neverrar.datacloudplatform.backend.util.Result;
-import com.neverrar.datacloudplatform.backend.view.AllProjectInfoByUser;
-import com.neverrar.datacloudplatform.backend.view.AllTaskByProject;
-import com.neverrar.datacloudplatform.backend.view.AllTesterByProject;
-import com.neverrar.datacloudplatform.backend.view.ProjectInformation;
+import com.neverrar.datacloudplatform.backend.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,9 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.awt.print.PrinterJob;
+import java.util.*;
 
 @Service
 public class ProjectService {
@@ -121,6 +114,48 @@ public class ProjectService {
         result.setProjectId(optionalProject.get().getId());
         return Result.wrapSuccessfulResult(result);
 
+    }
+
+    public Result<ProjectWithTask> getProjectStructure(User user,Integer id){
+        Optional<Project> optionalProject= projectRepository.findById(id);
+        if(!optionalProject.isPresent()) {
+            return Result.wrapErrorResult(new ProjectNotExistedError());
+        }
+        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
+        }
+        Project project=optionalProject.get();
+        ProjectWithTask projectWithTask=new ProjectWithTask();
+        projectWithTask.setProjectName(project.getName());
+        projectWithTask.setProjectId(project.getId());
+        projectWithTask.setOwnedTask(new LinkedList<>());
+        for(Task task: project.taskSetInstance() ){
+            HashMap<Integer, Tester> ownedTester=new HashMap<>();
+            for(Test test :task.testSetInstance()){
+                Tester tester=test.getTester();
+                if(ownedTester.containsKey(tester.getId())){
+                    continue;
+                }
+                ownedTester.put(test.getId(),tester);
+            }
+            TaskWithTester taskWithTester=new TaskWithTester();
+            taskWithTester.setTaskId(task.getId());
+            taskWithTester.setTaskName(task.getName());
+            taskWithTester.setOwnerTester(new LinkedList<>());
+            projectWithTask.getOwnedTask().add(taskWithTester);
+            for(Tester tester:ownedTester.values()){
+                TesterWithTest testerWithTest=new TesterWithTest();
+                testerWithTest.setTesterId(tester.getId());
+                testerWithTest.setTesterName(tester.getName());
+                testerWithTest.setOwnedTest(new LinkedList<>());
+                taskWithTester.getOwnerTester().add(testerWithTest);
+                for(Test test:tester.testSetInstance()){
+                    TestTag testTag=new TestTag(test);
+                    testerWithTest.getOwnedTest().add(testTag);
+                }
+            }
+        }
+        return Result.wrapSuccessfulResult(projectWithTask);
     }
 
     public Result<AllTesterByProject> getOwnedTester (User user, Integer id) {

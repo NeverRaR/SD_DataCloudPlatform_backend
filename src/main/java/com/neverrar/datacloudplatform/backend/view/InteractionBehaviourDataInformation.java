@@ -1,5 +1,6 @@
 package com.neverrar.datacloudplatform.backend.view;
 
+import com.neverrar.datacloudplatform.backend.model.InteractionBehaviourData;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -15,13 +16,27 @@ public class InteractionBehaviourDataInformation {
 
     private String element;
 
-    private String startTime;
+    private Date startTime;
 
-    private String endTime;
+    private Date endTime;
 
     private String startStatus;
 
     private String endStatus;
 
     private Double distanceStartingTime;
+
+    public InteractionBehaviourDataInformation(InteractionBehaviourData data){
+        this.type=data.getType();
+        this.location=data.getLocation();
+        this.element=data.getElement();
+        this.startTime=data.getStartTime();
+        this.endTime=data.getEndTime();
+        this.startStatus=data.getStartStatus();
+        this.endStatus=data.getEndStatus();
+        this.distanceStartingTime=data.getDistanceStartingTime();
+
+    }
+
+
 }

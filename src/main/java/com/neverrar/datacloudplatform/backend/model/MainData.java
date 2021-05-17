@@ -16,9 +16,31 @@ public class MainData {
             generator="ID_GENERATOR")
     private Integer id;
 
-    private String path;
+    @Temporal(TemporalType.DATE)
+    @Column(name="data_date")
+    private Date dataDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="data_time")
+    private Date dataTime;
+
+    private Double speed;
+
+    private Double accelerate;
+
+    @Column(name="turn_around")
+    private Double turnAround;
+
+    @Column(name = "left_line_distance")
+    private Double leftLineDistance;
+
+    @Column(name = "right_line_distance")
+    private Double rightLineDistance;
+
+    @Column(name = "distance_starting_time")
+    private Double distanceStartingTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="test_id")
     private Test test;
 
@@ -39,11 +61,67 @@ public class MainData {
         this.test = test;
     }
 
-    public String getPath() {
-        return path;
+    public Date getTime() {
+        return dataTime;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setTime(Date dataTime) {
+        this.dataTime = dataTime;
+    }
+
+    public Double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(Double speed) {
+        this.speed = speed;
+    }
+
+    public Double getAccelerate() {
+        return accelerate;
+    }
+
+    public void setAccelerate(Double accelerate) {
+        this.accelerate = accelerate;
+    }
+
+    public Double getTurnAround() {
+        return turnAround;
+    }
+
+    public void setTurnAround(Double turnAround) {
+        this.turnAround = turnAround;
+    }
+
+    public Double getLeftLineDistance() {
+        return leftLineDistance;
+    }
+
+    public void setLeftLineDistance(Double leftLineDistance) {
+        this.leftLineDistance = leftLineDistance;
+    }
+
+    public Double getRightLineDistance() {
+        return rightLineDistance;
+    }
+
+    public void setRightLineDistance(Double rightLineDistance) {
+        this.rightLineDistance = rightLineDistance;
+    }
+
+    public Double getDistanceStartingTime() {
+        return distanceStartingTime;
+    }
+
+    public void setDistanceStartingTime(Double distanceStartingTime) {
+        this.distanceStartingTime = distanceStartingTime;
+    }
+
+    public Date getDate() {
+        return dataDate;
+    }
+
+    public void setDate(Date dataDate) {
+        this.dataDate = dataDate;
     }
 }

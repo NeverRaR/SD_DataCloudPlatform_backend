@@ -14,11 +14,13 @@ public class TestInformation {
     private Integer testerId;
     private Integer taskId;
     private Date testTime;
+    private String testName;
 
     public TestInformation(Test test){
         this.taskId=test.getTask().getId();
         this.testerId=test.getTester().getId();
         this.id=test.getId();
         this.testTime=test.getTestTime();
+        this.testName=test.getName();
     }
 }
