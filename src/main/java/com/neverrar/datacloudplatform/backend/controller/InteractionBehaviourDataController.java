@@ -14,7 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller // This means that this class is a Controller
-@RequestMapping(path="api/ibdata") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="api/interactionbehaviourdata") // This means URL's start with /demo (after Application path)
 public class InteractionBehaviourDataController {
     @Autowired
     private AuthenticationService authenticationService;

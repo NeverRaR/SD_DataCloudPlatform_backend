@@ -9,7 +9,14 @@ import java.util.Date;
 public class LogEventData {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @TableGenerator(name="ID_GENERATOR",
+            table="ID_GENERATOR",
+            pkColumnName="PK_NAME",
+            pkColumnValue="LEDATA_ID",
+            valueColumnName="PK_VALUE",
+            allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.TABLE,
+            generator="ID_GENERATOR")
     private Integer id;
 
     private String type;
