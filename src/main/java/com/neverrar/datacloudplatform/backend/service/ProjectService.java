@@ -123,7 +123,13 @@ public class ProjectService {
         if (user == null) {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        AllProjectInfoByUser result=new AllProjectInfoByUser(user.projectSetInstance());
+        AllProjectInfoByUser result;
+        if(user.getRole()==1){
+            result = new AllProjectInfoByUser(projectRepository.findAll());
+        }
+        else {
+            result = new AllProjectInfoByUser(user.projectSetInstance());
+        }
         result.setUserId(user.getId());
         return Result.wrapSuccessfulResult(result);
     }

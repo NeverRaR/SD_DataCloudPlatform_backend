@@ -12,7 +12,7 @@ public class AllProjectInfoByUser {
 
     private String userId;
     private List<ProjectTag> ownedProjects;
-    public AllProjectInfoByUser(Set<Project> projectSet){
+    public AllProjectInfoByUser(Iterable<Project> projectSet){
         ownedProjects = new LinkedList<>();
         for(Project project : projectSet){
             ProjectTag tag=new ProjectTag();
