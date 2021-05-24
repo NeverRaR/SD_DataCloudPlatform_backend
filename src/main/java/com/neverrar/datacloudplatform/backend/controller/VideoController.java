@@ -7,6 +7,7 @@ import com.neverrar.datacloudplatform.backend.service.MainDataService;
 import com.neverrar.datacloudplatform.backend.service.VideoService;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllMainDataByTest;
+import com.neverrar.datacloudplatform.backend.view.AllVideoByTest;
 import com.neverrar.datacloudplatform.backend.view.VideoByTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,12 +25,12 @@ public class VideoController {
 
     @GetMapping
     public @ResponseBody
-    Result<VideoByTest> getAllMainDataByTest (@CookieValue(value = "sessionId",
-            defaultValue = "noSession") String sessionId, @RequestParam Integer testId, @RequestParam String videoName) {
+    Result<AllVideoByTest> getAllMainDataByTest (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId, @RequestParam Integer testId) {
         User user=authenticationService.getUser(sessionId);
         if(user==null)  {
             return Result.wrapErrorResult(new InvalidSessionIdError());
         }
-        return videoService.getVideoByTest(testId,user,videoName);
+        return videoService.getVideoByTest(testId,user);
     }
 }

@@ -10,6 +10,7 @@ import com.neverrar.datacloudplatform.backend.repository.TestRepository;
 import com.neverrar.datacloudplatform.backend.repository.VideoRepository;
 import com.neverrar.datacloudplatform.backend.util.Result;
 import com.neverrar.datacloudplatform.backend.view.AllMainDataByTest;
+import com.neverrar.datacloudplatform.backend.view.AllVideoByTest;
 import com.neverrar.datacloudplatform.backend.view.VideoByTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class VideoService {
     @Autowired
     private TestRepository testRepository;
 
-    public Result<VideoByTest> getVideoByTest(Integer testId, User user,String videoName){
+    public Result<AllVideoByTest> getVideoByTest(Integer testId, User user){
         try {
             Optional<Test> optionalTest = testRepository.findById(testId);
             if (!optionalTest.isPresent()) {
@@ -34,17 +35,10 @@ public class VideoService {
             if (user.getRole().equals(0) && !optionalTest.get().getOwner().getId().equals(user.getId())) {
                 return Result.wrapErrorResult(new PermissionDeniedError());
             }
-            VideoByTest videoByTest=new VideoByTest();
-            videoByTest.setTestId(testId);
-            videoByTest.setVideoName(videoName);
             Test test=optionalTest.get();
-            for(Video video:test.getVideoSet()){
-                if(video.getName().equals(videoName)) {
-                    videoByTest.setVideoUrl(video.getUrl());
-                    break;
-                }
-            }
-            return Result.wrapSuccessfulResult(videoByTest);
+            AllVideoByTest allVideoByTest=new AllVideoByTest(test.getVideoSet());
+            allVideoByTest.setTestId(testId);
+            return Result.wrapSuccessfulResult(allVideoByTest);
         } catch (Exception e){
             e.printStackTrace();
         }
