@@ -42,7 +42,7 @@ public class MainDataService {
             if (!optionalTest.isPresent()) {
                 return Result.wrapErrorResult(new TesterNotExistedError());
             }
-            if (!optionalTest.get().getOwner().getId().equals(user.getId())) {
+            if (user.getRole().equals(0) && !optionalTest.get().getOwner().getId().equals(user.getId())) {
                 return Result.wrapErrorResult(new PermissionDeniedError());
             }
             AllMainDataByTest allMainDataByTest = new AllMainDataByTest(optionalTest.get().getMainDataSet());

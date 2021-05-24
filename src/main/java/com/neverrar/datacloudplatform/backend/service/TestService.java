@@ -42,14 +42,14 @@ public class TestService {
         if(!optionalTester.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
-        if(!optionalTester.get().getOwner().getId().equals(user.getId())){
+        if(user.getRole().equals(0)&& !optionalTester.get().getOwner().getId().equals(user.getId())){
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Optional<Task> optionalTask=taskRepository.findById(body.getTaskId());
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
         }
-        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
+        if(user.getRole().equals(0)&& !optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Test test=new Test();
@@ -67,10 +67,7 @@ public class TestService {
         if(!optionalTest.isPresent()) {
             return Result.wrapErrorResult(new TestNotExistedError());
         }
-        if(user.getRole().equals(1)) {
-            return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
-        }
-        if(!user.getId().equals(optionalTest.get().getOwner().getId())) {
+        if(user.getRole().equals(0) && !user.getId().equals(optionalTest.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         return Result.wrapSuccessfulResult(new TestInformation(optionalTest.get()));
@@ -83,7 +80,7 @@ public class TestService {
         if(!optionalTest.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
-        if(!optionalTest.get().getOwner().getId().equals(user.getId())){
+        if(user.getRole().equals(0) && !optionalTest.get().getOwner().getId().equals(user.getId())){
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         testRepository.delete(optionalTest.get());

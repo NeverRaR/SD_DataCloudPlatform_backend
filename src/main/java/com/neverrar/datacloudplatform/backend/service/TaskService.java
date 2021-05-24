@@ -45,7 +45,7 @@ public class TaskService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!optionalProject.get().getOwner().getId().equals(user.getId())) {
+        if(user.getRole().equals(0)&& !optionalProject.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Task task=new Task();
@@ -63,7 +63,7 @@ public class TaskService {
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalTask.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalTask.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         return Result.wrapSuccessfulResult(new TaskInformation(optionalTask.get()));
@@ -75,7 +75,7 @@ public class TaskService {
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
         }
-        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
+        if(user.getRole().equals(0)&& !optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Task task=optionalTask.get();
@@ -92,7 +92,7 @@ public class TaskService {
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
         }
-        if(!optionalTask.get().getOwner().getId().equals(user.getId())) {
+        if(user.getRole().equals(0)&& !optionalTask.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         taskRepository.delete(optionalTask.get());
@@ -104,7 +104,7 @@ public class TaskService {
         if(!optionalTask.isPresent()) {
             return Result.wrapErrorResult(new TaskNotExistedError());
         }
-        if(!user.getId().equals(optionalTask.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalTask.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Tester tester=new Tester();

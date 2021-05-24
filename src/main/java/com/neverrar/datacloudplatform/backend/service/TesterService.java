@@ -62,7 +62,7 @@ public class TesterService {
         if(!optionalTester.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
-        if(!user.getId().equals(optionalTester.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalTester.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         return Result.wrapSuccessfulResult(new TesterInformation(optionalTester.get()));
@@ -74,6 +74,9 @@ public class TesterService {
         Optional<Tester> optionalTester=testerRepository.findById(id);
         if(!optionalTester.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
+        }
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalTester.get().getOwner().getId())) {
+            return Result.wrapErrorResult(new PermissionDeniedError());
         }
         String gender=body.getGender();
         Tester tester=optionalTester.get();
@@ -96,7 +99,7 @@ public class TesterService {
         if(!optionalTester.isPresent()) {
             return Result.wrapErrorResult(new TesterNotExistedError());
         }
-        if(!optionalTester.get().getOwner().getId().equals(user.getId())) {
+        if(user.getRole().equals(0)&& !optionalTester.get().getOwner().getId().equals(user.getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         testerRepository.delete(optionalTester.get());

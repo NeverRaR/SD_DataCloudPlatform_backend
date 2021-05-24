@@ -139,7 +139,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         AllTaskByProject result=new AllTaskByProject(optionalProject.get().taskSetInstance());
@@ -153,7 +153,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Project project=optionalProject.get();
@@ -195,7 +195,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         AllTesterByProject result=new AllTesterByProject(optionalProject.get().testerSetInstance());
@@ -211,7 +211,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()) {
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
         Project project=optionalProject.get();
@@ -231,7 +231,7 @@ public class ProjectService {
         if(!optionalProject.isPresent()){
             return Result.wrapErrorResult(new ProjectNotExistedError());
         }
-        if(!user.getId().equals(optionalProject.get().getOwner().getId())) {
+        if(user.getRole().equals(0)&& !user.getId().equals(optionalProject.get().getOwner().getId())) {
             return Result.wrapErrorResult(new PermissionDeniedError());
         }
 
