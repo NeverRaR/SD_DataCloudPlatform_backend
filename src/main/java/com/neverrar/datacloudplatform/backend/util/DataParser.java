@@ -131,6 +131,7 @@ public class DataParser {
    }
 
    private void uploadTest(){
+       if(dataFolder==null)return;
        File[] testerList = dataFolder.listFiles();
        if(testerList==null) return;
        for(File testerFile : testerList){
@@ -157,6 +158,7 @@ public class DataParser {
    }
 
    private void uploadVideo(){
+       if(screenCaptureFolder==null) return;
        File[] testerList = screenCaptureFolder.listFiles();
        if(testerList==null) return;
        for(File testerFile : testerList){
