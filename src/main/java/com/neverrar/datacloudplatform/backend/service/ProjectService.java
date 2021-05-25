@@ -120,6 +120,7 @@ public class ProjectService {
         for(Project project : projectSet){
             if(project.getId()>maxId) {
                 latestProject=project;
+                maxId=project.getId();
             }
         }
         Test test=latestProject.taskSetInstance().iterator().next().testSetInstance().iterator().next();
