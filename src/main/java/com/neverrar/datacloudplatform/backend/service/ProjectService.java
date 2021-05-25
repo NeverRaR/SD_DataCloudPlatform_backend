@@ -51,6 +51,9 @@ public class ProjectService {
     private MarkDataRepository markDataRepository;
 
     @Autowired
+    private LogEventDataRepository logEventDataRepository;
+
+    @Autowired
     private VideoRepository videoRepository;
 
     @Autowired
@@ -70,6 +73,7 @@ public class ProjectService {
         dataParser.setOssService(ossService);
         dataParser.setVideoRepository(videoRepository);
         dataParser.setMarkDataRepository(markDataRepository);
+        dataParser.setLogEventDataRepository(logEventDataRepository);
 
 
         dataParser.setOwner(user);

@@ -5,8 +5,16 @@ import java.util.Date;
 
 @Entity
 public class MarkData {
+
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @TableGenerator(name="ID_GENERATOR",
+            table="ID_GENERATOR",
+            pkColumnName="PK_NAME",
+            pkColumnValue="MARKDATA_ID",
+            valueColumnName="PK_VALUE",
+            allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.TABLE,
+            generator="ID_GENERATOR")
     private Integer id;
 
     private String name;
