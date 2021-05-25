@@ -15,6 +15,11 @@ public class MarkData {
 
     private Double length;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name="system_date")
+    private Date systemDate;
+
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="system_time")
     private Date systemTime;
@@ -80,5 +85,13 @@ public class MarkData {
 
     public void setTest(Test test) {
         this.test = test;
+    }
+
+    public Date getSystemDate() {
+        return systemDate;
+    }
+
+    public void setSystemDate(Date systemDate) {
+        this.systemDate = systemDate;
     }
 }

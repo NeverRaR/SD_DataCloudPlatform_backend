@@ -57,6 +57,10 @@ public class DataParser {
 
    private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
 
+   private MarkDataRepository markDataRepository;
+
+   private LogEventDataRepository logEventDataRepository;
+
    private VideoRepository videoRepository;
 
    private OSSService ossService;
@@ -206,7 +210,27 @@ public class DataParser {
    }
 
     private void uploadMarkData(Test test,File file){
-
+        try {
+            CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
+            csvReader.readHeaders();
+            List<MarkData> list=new LinkedList<>();
+            while(csvReader.readRecord()){
+                MarkData data=new MarkData();
+                data.setTest(test);
+                data.setColor(csvReader.get("Color"));
+                data.setName(csvReader.get("Name"));
+                data.setSystemDate(dateValue(csvReader.get("SystemDate"),"yyyy-MM-dd"));
+                data.setSystemTime(dateValue(csvReader.get("SystemTime"),"HH:mm:ss.SSS"));
+                data.setMarkInfo(csvReader.get("MarkInfo"));
+                data.setLength(doubleValue(csvReader.get("Length")));
+                data.setTest(test);
+                list.add(data);
+            }
+            markDataRepository.saveAll(list);
+            csvReader.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void uploadInteractionBehaviourData(Test test,File file){
@@ -256,7 +280,27 @@ public class DataParser {
     }
 
     private void uploadLogEventData(Test test,File file){
-
+        try {
+            CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
+            csvReader.readHeaders();
+            List<LogEventData> list=new LinkedList<>();
+            while(csvReader.readRecord()){
+                LogEventData data=new LogEventData();
+                data.setTest(test);
+                data.setType(csvReader.get("Type"));
+                data.setFrom(csvReader.get("From"));
+                data.setTo(csvReader.get("To"));
+                data.setDataTime(dateValue(csvReader.get("Time"),"yyyy-MM-dd HH:mm:ss.SSS"));
+                data.setDuration(doubleValue(csvReader.get("Duration")));
+                data.setDistanceStartingTime(doubleValue(csvReader.get("DistanceStartingTime")));
+                data.setTest(test);
+                list.add(data);
+            }
+            logEventDataRepository.saveAll(list);
+            csvReader.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
    private void uploadMainData(Test test,File file){
@@ -403,5 +447,21 @@ public class DataParser {
 
     public void setOssService(OSSService ossService) {
         this.ossService = ossService;
+    }
+
+    public MarkDataRepository getMarkDataRepository() {
+        return markDataRepository;
+    }
+
+    public void setMarkDataRepository(MarkDataRepository markDataRepository) {
+        this.markDataRepository = markDataRepository;
+    }
+
+    public LogEventDataRepository getLogEventDataRepository() {
+        return logEventDataRepository;
+    }
+
+    public void setLogEventDataRepository(LogEventDataRepository logEventDataRepository) {
+        this.logEventDataRepository = logEventDataRepository;
     }
 }

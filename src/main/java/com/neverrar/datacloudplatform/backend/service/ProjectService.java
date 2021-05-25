@@ -48,6 +48,9 @@ public class ProjectService {
     private InteractionBehaviourDataRepository interactionBehaviourDataRepository;
 
     @Autowired
+    private MarkDataRepository markDataRepository;
+
+    @Autowired
     private VideoRepository videoRepository;
 
     @Autowired
@@ -66,6 +69,8 @@ public class ProjectService {
         dataParser.setInteractionBehaviourDataRepository(interactionBehaviourDataRepository);
         dataParser.setOssService(ossService);
         dataParser.setVideoRepository(videoRepository);
+        dataParser.setMarkDataRepository(markDataRepository);
+
 
         dataParser.setOwner(user);
         dataParser.parseZip(data);
