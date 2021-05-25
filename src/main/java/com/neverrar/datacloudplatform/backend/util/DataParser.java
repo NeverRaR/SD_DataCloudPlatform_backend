@@ -351,6 +351,7 @@ public class DataParser {
 
    private void parseProject(File file){
        project.setName(file.getName());
+       project.setCreateTime(new Date());
        project.setOwner(owner);
    }
 
