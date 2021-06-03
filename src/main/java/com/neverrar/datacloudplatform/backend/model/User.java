@@ -16,6 +16,8 @@ public class User {
 
     private String password;
 
+    private String avatar;
+
     private Integer role;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
@@ -84,5 +86,13 @@ public class User {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

@@ -32,4 +32,15 @@ public class MainDataController {
         }
         return mainDataService.getAllMainDataByTest(testId,user);
     }
+
+
+    @GetMapping("/latest")
+    public @ResponseBody Result<AllMainDataByTest> getLatestMain (@CookieValue(value = "sessionId",
+            defaultValue = "noSession") String sessionId) {
+        User user=authenticationService.getUser(sessionId);
+        if(user==null)  {
+            return Result.wrapErrorResult(new InvalidSessionIdError());
+        }
+        return  mainDataService.getLatestMain(user);
+    }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 
 @Data
 public class AllMainDataByTest implements Serializable {
+    private Integer projectId;
     private Integer testId;
     private List<MainDataInformation> list;
 

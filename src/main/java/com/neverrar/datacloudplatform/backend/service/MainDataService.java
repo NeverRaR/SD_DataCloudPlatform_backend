@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MainDataService {
@@ -53,5 +50,27 @@ public class MainDataService {
         }
         return Result.wrapErrorResult(new UnknownError());
     }
+
+    public Result<AllMainDataByTest> getLatestMain(User user){
+        Set<Project> projectSet=user.projectSetInstance();
+        if(projectSet==null&&projectSet.isEmpty()) {
+            return null;
+        }
+        Project latestProject=projectSet.iterator().next();
+        Integer maxId=latestProject.getId();
+        for(Project project : projectSet){
+            if(project.getId()>maxId) {
+                latestProject=project;
+                maxId=project.getId();
+            }
+        }
+        Test test=latestProject.taskSetInstance().iterator().next().testSetInstance().iterator().next();
+        AllMainDataByTest allMainDataByTest = new AllMainDataByTest(test.getMainDataSet());
+        allMainDataByTest.setTestId(test.getId());
+        allMainDataByTest.setProjectId(latestProject.getId());
+        return Result.wrapSuccessfulResult(allMainDataByTest);
+    }
+
+
 
 }

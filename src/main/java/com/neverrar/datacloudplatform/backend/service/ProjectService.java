@@ -110,25 +110,6 @@ public class ProjectService {
     }
 
 
-    public Result<AllMainDataByTest> getLatestMain(User user){
-        Set<Project> projectSet=user.projectSetInstance();
-        if(projectSet==null&&projectSet.isEmpty()) {
-            return null;
-        }
-        Project latestProject=projectSet.iterator().next();
-        Integer maxId=latestProject.getId();
-        for(Project project : projectSet){
-            if(project.getId()>maxId) {
-                latestProject=project;
-                maxId=project.getId();
-            }
-        }
-        Test test=latestProject.taskSetInstance().iterator().next().testSetInstance().iterator().next();
-        AllMainDataByTest allMainDataByTest = new AllMainDataByTest(test.getMainDataSet());
-        allMainDataByTest.setTestId(test.getId());
-        return Result.wrapSuccessfulResult(allMainDataByTest);
-    }
-
     public Result<AllProjectInfoByUser> getOwnedProject (User user) {
         if (user == null) {
             return Result.wrapErrorResult(new InvalidSessionIdError());
@@ -183,6 +164,7 @@ public class ProjectService {
                 }
                 ownedTester.put(tester.getId(),tester);
                 selectedTest.put(tester.getId(),new LinkedList<>());
+                selectedTest.get(tester.getId()).add(test);
             }
             TaskWithTester taskWithTester=new TaskWithTester();
             taskWithTester.setTaskId(task.getId());
@@ -199,6 +181,13 @@ public class ProjectService {
                     TestTag testTag=new TestTag(test);
                     testerWithTest.getOwnedTest().add(testTag);
                 }
+            }
+        }
+        projectWithTask.getOwnedTask().sort(Comparator.comparingInt(TaskWithTester::getTaskId));
+        for(TaskWithTester taskWithTester :projectWithTask.getOwnedTask()){
+            taskWithTester.getOwnerTester().sort(Comparator.comparingInt(TesterWithTest::getTesterId));
+            for(TesterWithTest testerWithTest: taskWithTester.getOwnerTester()){
+                testerWithTest.getOwnedTest().sort(Comparator.comparingInt(TestTag::getTestId));
             }
         }
         return Result.wrapSuccessfulResult(projectWithTask);

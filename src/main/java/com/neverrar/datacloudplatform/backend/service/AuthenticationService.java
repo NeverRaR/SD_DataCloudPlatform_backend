@@ -45,7 +45,7 @@ public class AuthenticationService {
 
         double seed= ThreadLocalRandom.current().nextDouble();
         String sessionId=HashHelper.computeMD5Hash(user.getId()+ seed);
-        template.opsForValue().set(sessionId,user.getId().toString(),72, TimeUnit.HOURS);
+        template.opsForValue().set(sessionId,user.getId().toString(),3 , TimeUnit.DAYS);
 
         return sessionId;
 

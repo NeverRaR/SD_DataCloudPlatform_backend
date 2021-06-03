@@ -8,11 +8,13 @@ public class UserInformation {
     private Integer role;
     private String nickName;
     private String id;
+    private String avatar;
     public UserInformation(User user){
 
         this.role=user.getRole();
         this.nickName=user.getNickname();
         this.id=user.getId();
+        this.avatar=user.getAvatar();
     }
 
 }
