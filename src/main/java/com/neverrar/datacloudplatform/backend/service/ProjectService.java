@@ -171,27 +171,31 @@ public class ProjectService {
         projectWithTask.setProjectName(project.getName());
         projectWithTask.setProjectId(project.getId());
         projectWithTask.setOwnedTask(new LinkedList<>());
+
         for(Task task: project.taskSetInstance() ){
             HashMap<Integer, Tester> ownedTester=new HashMap<>();
+            HashMap<Integer,List<Test>> selectedTest=new HashMap<>();
             for(Test test :task.testSetInstance()){
                 Tester tester=test.getTester();
                 if(ownedTester.containsKey(tester.getId())){
+                    selectedTest.get(tester.getId()).add(test);
                     continue;
                 }
-                ownedTester.put(test.getId(),tester);
+                ownedTester.put(tester.getId(),tester);
+                selectedTest.put(tester.getId(),new LinkedList<>());
             }
             TaskWithTester taskWithTester=new TaskWithTester();
             taskWithTester.setTaskId(task.getId());
             taskWithTester.setTaskName(task.getName());
             taskWithTester.setOwnerTester(new LinkedList<>());
             projectWithTask.getOwnedTask().add(taskWithTester);
-            for(Tester tester:ownedTester.values()){
+            for(Tester tester: ownedTester.values()){
                 TesterWithTest testerWithTest=new TesterWithTest();
                 testerWithTest.setTesterId(tester.getId());
                 testerWithTest.setTesterName(tester.getName());
                 testerWithTest.setOwnedTest(new LinkedList<>());
                 taskWithTester.getOwnerTester().add(testerWithTest);
-                for(Test test:tester.testSetInstance()){
+                for(Test test: selectedTest.get(tester.getId())){
                     TestTag testTag=new TestTag(test);
                     testerWithTest.getOwnedTest().add(testTag);
                 }
