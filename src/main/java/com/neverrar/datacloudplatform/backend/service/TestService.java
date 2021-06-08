@@ -56,7 +56,6 @@ public class TestService {
         test.setOwner(user);
         test.setTask(optionalTask.get());
         test.setTester(optionalTester.get());
-        test.setTestTime(new Date());
         testRepository.save(test);
 
         return Result.wrapSuccessfulResult(new TestInformation(test));

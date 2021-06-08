@@ -3,7 +3,6 @@ package com.neverrar.datacloudplatform.backend.view;
 import com.neverrar.datacloudplatform.backend.model.MainData;
 import com.neverrar.datacloudplatform.backend.request.MainDataRequest;
 import lombok.Data;
-import sun.applet.Main;
 
 import java.io.Serializable;
 import java.util.LinkedList;

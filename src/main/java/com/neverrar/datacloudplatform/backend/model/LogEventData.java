@@ -1,7 +1,5 @@
 package com.neverrar.datacloudplatform.backend.model;
 
-import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
-
 import javax.persistence.*;
 import java.util.Date;
 

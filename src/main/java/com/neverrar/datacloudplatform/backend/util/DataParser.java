@@ -43,6 +43,8 @@ public class DataParser {
 
    private File dataFolder;
 
+   private File testInfoFile;
+
    private File screenCaptureFolder;
 
    private ProjectRepository projectRepository;
@@ -91,19 +93,20 @@ public class DataParser {
        for(File dataFile: dataList){
            switch (dataFile.getName()) {
                case "DataFolder":
-                   parseTester(dataFile);
                    dataFolder=dataFile;
                    break;
                case "ScreenCaptureFolder":
                    screenCaptureFolder=dataFile;
                    break;
                case "Task.csv":
-                   updateTestInfo(dataFile);
+                   testInfoFile=dataFile;
                    break;
                default:
                    break;
            }
        }
+       parseTester(dataFolder);
+       updateTestInfo(testInfoFile);
    }
 
    /*
@@ -115,13 +118,16 @@ public class DataParser {
            csvReader.readHeaders();
            while(csvReader.readRecord()){
                String taskName=csvReader.get(2);
-               Task task=taskHashMap.get(taskName);
                String testerName = csvReader.get(4);
-               Tester tester=testerHashMap.get(testerName);
                String testName= csvReader.get(3);
-               Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testName);
-               test.setStartTime(dateValue(csvReader.get(0),"yyyy-MM-dd HH:mm:ss.SSS"));
-               test.setEndTime(dateValue(csvReader.get(1),"yyyy-MM-dd HH:mm:ss.SSS"));
+               Test test=testHashMap.get(testerName+"/"+taskName+"/"+testName);
+               if(test == null) {
+                   System.out.println(testerName+"/"+taskName+"/"+testName);
+                   continue;
+               }
+               //todo 等待task.csv格式修改
+               test.setStartTime(dateValue(csvReader.get(0),"202021/MM/dd HH:mm:ss"));
+               test.setEndTime(dateValue(csvReader.get(1),"21/MM/dd HH:mm:ss"));
                test.setSuccessful(csvReader.get(5));
                test.setErrorCount(doubleValue(csvReader.get(6)));
            }
@@ -172,7 +178,7 @@ public class DataParser {
                File[] testList = taskFile.listFiles();
                if(testList==null) continue;
                for(File testFile : testList){
-                   Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testFile.getName());
+                   Test test=testHashMap.get(tester.getName()+"/"+task.getName()+"/"+testFile.getName());
                    testRepository.save(test);
                    uploadTestData(test,testFile);
                }
@@ -193,7 +199,7 @@ public class DataParser {
                File[] testList = taskFile.listFiles();
                if(testList==null) continue;
                for(File testFile : testList){
-                   Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testFile.getName());
+                   Test test=testHashMap.get(tester.getName()+"/"+task.getName()+"/"+testFile.getName());
                    File[] videoList = testFile.listFiles();
                    if(videoList==null) continue;
                    for(File videoFile : videoList){
@@ -397,12 +403,14 @@ public class DataParser {
        if(tempList==null) return;
        for(File tFile : tempList){
            String name=tFile.getName();
-           if(taskHashMap.containsKey(name)) continue;
-           Task task=new Task();
-           task.setName(name);
-           task.setProject(project);
-           task.setOwner(owner);
-           taskHashMap.put(name,task);
+           Task task = taskHashMap.get(name);
+           if(task == null) {
+               task = new Task();
+               task.setName(name);
+               task.setProject(project);
+               task.setOwner(owner);
+               taskHashMap.put(name, task);
+           }
            parseTest(tFile,tester,task);
        }
    }
@@ -417,7 +425,7 @@ public class DataParser {
            test.setTester(tester);
            test.setTask(task);
            test.setName(name);
-           testHashMap.put(tester.getId()+"/"+task.getId()+"/"+test.getName(),test);
+           testHashMap.put(tester.getName()+"/"+task.getName()+"/"+test.getName(),test);
        }
    }
    public void display(){

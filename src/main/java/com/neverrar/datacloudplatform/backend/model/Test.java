@@ -1,6 +1,5 @@
 package com.neverrar.datacloudplatform.backend.model;
 
-import sun.applet.Main;
 
 import javax.persistence.*;
 import java.util.Date;
