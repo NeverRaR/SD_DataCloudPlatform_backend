@@ -5,14 +5,22 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+/*
+ * "yyyy-MM-dd"
+ * "HH:mm:ss.SSS"
+ * "yyyy-MM-dd HH:mm:ss.SSS"
+ */
 
 @Data
 public class MainDataInformation implements Serializable {
 
     private Date date;
 
-    private Date time;
+    private String time;
 
     private Double speed;
 
@@ -28,8 +36,10 @@ public class MainDataInformation implements Serializable {
 
 
     public MainDataInformation(MainData mainData){
+
+        DateFormat dateFormat= new SimpleDateFormat("HH:mm:ss.SSS");
+        this.time=dateFormat.format(mainData.getTime());
         this.date=mainData.getDate();
-        this.time=mainData.getTime();
         this.speed=mainData.getSpeed();
         this.accelerate=mainData.getAccelerate();
         this.turnAround=mainData.getTurnAround();

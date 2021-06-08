@@ -6,6 +6,8 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -16,9 +18,9 @@ public class InteractionBehaviourDataInformation {
 
     private String element;
 
-    private Date startTime;
+    private String startTime;
 
-    private Date endTime;
+    private String endTime;
 
     private String startStatus;
 
@@ -30,8 +32,9 @@ public class InteractionBehaviourDataInformation {
         this.type=data.getType();
         this.location=data.getLocation();
         this.element=data.getElement();
-        this.startTime=data.getStartTime();
-        this.endTime=data.getEndTime();
+        DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        this.startTime=dateFormat.format(data.getStartTime());
+        this.endTime=dateFormat.format(data.getEndTime());
         this.startStatus=data.getStartStatus();
         this.endStatus=data.getEndStatus();
         this.distanceStartingTime=data.getDistanceStartingTime();

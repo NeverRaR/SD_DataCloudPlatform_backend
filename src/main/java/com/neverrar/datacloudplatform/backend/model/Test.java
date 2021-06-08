@@ -13,8 +13,16 @@ public class Test {
     private Integer id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="test_time")
-    private Date testTime;
+    @Column(name="start_time")
+    private Date startTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="end_time")
+    private Date endTime;
+
+    private String successful;
+
+    private Double errorCount;
 
     @Column(name="test_name")
     private String name;
@@ -52,14 +60,6 @@ public class Test {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Date getTestTime() {
-        return testTime;
-    }
-
-    public void setTestTime(Date testTime) {
-        this.testTime = testTime;
     }
 
     public User getOwner() {
@@ -144,5 +144,37 @@ public class Test {
 
     public void setVideoSet(Set<Video> videoSet) {
         this.videoSet = videoSet;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getSuccessful() {
+        return successful;
+    }
+
+    public void setSuccessful(String successful) {
+        this.successful = successful;
+    }
+
+    public Double getErrorCount() {
+        return errorCount;
+    }
+
+    public void setErrorCount(Double errorCount) {
+        this.errorCount = errorCount;
     }
 }

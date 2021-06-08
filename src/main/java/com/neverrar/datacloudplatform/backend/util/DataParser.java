@@ -96,9 +96,38 @@ public class DataParser {
                    break;
                case "ScreenCaptureFolder":
                    screenCaptureFolder=dataFile;
+                   break;
+               case "Task.csv":
+                   updateTestInfo(dataFile);
+                   break;
                default:
                    break;
            }
+       }
+   }
+
+   /*
+         任务开始时间,任务结束时间,任务名称,任务具体次数,实验用户名,是否完成,出错次数
+    */
+   public void updateTestInfo(File file){
+       try {
+           CsvReader csvReader = new CsvReader(file.getAbsolutePath(), ',', Charset.forName("GBK"));
+           csvReader.readHeaders();
+           while(csvReader.readRecord()){
+               String taskName=csvReader.get(2);
+               Task task=taskHashMap.get(taskName);
+               String testerName = csvReader.get(4);
+               Tester tester=testerHashMap.get(testerName);
+               String testName= csvReader.get(3);
+               Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testName);
+               test.setStartTime(dateValue(csvReader.get(0),"yyyy-MM-dd HH:mm:ss.SSS"));
+               test.setEndTime(dateValue(csvReader.get(1),"yyyy-MM-dd HH:mm:ss.SSS"));
+               test.setSuccessful(csvReader.get(5));
+               test.setErrorCount(doubleValue(csvReader.get(6)));
+           }
+           csvReader.close();
+       } catch (Exception e){
+           e.printStackTrace();
        }
    }
 
@@ -143,14 +172,8 @@ public class DataParser {
                File[] testList = taskFile.listFiles();
                if(testList==null) continue;
                for(File testFile : testList){
-                   Test test=new Test();
-                   test.setOwner(owner);
-                   test.setTester(tester);
-                   test.setTask(task);
-                   test.setTestTime(new Date());
-                   test.setName((testFile.getName()));
+                   Test test=testHashMap.get(tester.getId()+"/"+task.getId()+"/"+testFile.getName());
                    testRepository.save(test);
-                   testHashMap.put(tester.getId()+"/"+task.getId()+"/"+test.getName(),test);
                    uploadTestData(test,testFile);
                }
            }
@@ -365,11 +388,11 @@ public class DataParser {
            tester.setProject(project);
            tester.setOwner(owner);
            testerHashMap.put(name,tester);
-           parseTask(tFile);
+           parseTask(tFile,tester);
        }
    }
 
-   private void parseTask(File file){
+   private void parseTask(File file,Tester tester){
        File[] tempList = file.listFiles();
        if(tempList==null) return;
        for(File tFile : tempList){
@@ -380,9 +403,23 @@ public class DataParser {
            task.setProject(project);
            task.setOwner(owner);
            taskHashMap.put(name,task);
+           parseTest(tFile,tester,task);
        }
    }
 
+   private void parseTest(File file,Tester tester,Task task){
+       File[] tempList = file.listFiles();
+       if(tempList==null) return;
+       for(File tFile : tempList){
+           String name=tFile.getName();
+           Test test=new Test();
+           test.setOwner(owner);
+           test.setTester(tester);
+           test.setTask(task);
+           test.setName(name);
+           testHashMap.put(tester.getId()+"/"+task.getId()+"/"+test.getName(),test);
+       }
+   }
    public void display(){
        for(Map.Entry<String,Tester> entry: testerHashMap.entrySet()){
            System.out.println(entry.getKey());

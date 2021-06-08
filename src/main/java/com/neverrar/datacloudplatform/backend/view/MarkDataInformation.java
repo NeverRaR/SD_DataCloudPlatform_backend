@@ -7,6 +7,8 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -17,7 +19,7 @@ public class MarkDataInformation {
 
     private Double length;
 
-    private Date systemTime;
+    private String systemTime;
 
     private Date systemDate;
 
@@ -30,7 +32,8 @@ public class MarkDataInformation {
         this.color=data.getColor();
         this.length=data.getLength();
         this.markInfo=data.getMarkInfo();
-        this.systemTime=data.getSystemTime();
+        DateFormat dateFormat= new SimpleDateFormat("HH:mm:ss.SSS");
+        this.systemTime=dateFormat.format(data.getSystemTime());
         this.systemDate=data.getSystemDate();
     }
 }

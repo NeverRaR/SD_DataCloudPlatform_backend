@@ -6,6 +6,8 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -17,7 +19,7 @@ public class LogEventDataInformation {
 
     private String to;
 
-    private Date time;
+    private String time;
 
     private Double duration;
 
@@ -26,6 +28,8 @@ public class LogEventDataInformation {
     public LogEventDataInformation(LogEventData data){
         this.type=data.getType();
         this.distanceStartingTime=data.getDistanceStartingTime();
+        DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        this.time=dateFormat.format(data.getDataTime());
         this.from=data.getFrom();
         this.to=data.getTo();
         this.duration=data.getDuration();
